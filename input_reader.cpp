@@ -25,7 +25,7 @@ InputReader::InputReader(std::istream &input)
     }
 }
 //----------------------------------------------------------------------------
-std::vector<Request> InputReader::Getrequests() {
+std::vector<Request> InputReader::GetRequests() {
     return move(requests);
 }
 //----------------------------------------------------------------------------

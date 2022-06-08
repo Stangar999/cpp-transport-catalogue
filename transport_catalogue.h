@@ -17,7 +17,7 @@ struct Stop{
 
 struct Bus{
     std::string bus;
-    std::vector<Stop*> stops;
+    std::vector<const Stop*> stops;
 };
 
 //struct request{
@@ -38,16 +38,21 @@ public:
 
     void FindStop();
 
-    void GetBusInfo();
+    BusInfo GetBusInfo(std::string name_bus);
 
     const std::deque<Stop> GetStops() const{
         return stops;
     };
+
+    const std::deque<Bus> GetBus() const{
+        return buses;
+    };
+
 private:
     std::deque<Stop> stops;
-    std::unordered_map<std::string, Stop*> index_stops;
+    std::unordered_map<std::string, const Stop*> index_stops;
     std::deque<Bus> buses;
-    std::unordered_map<std::string, Bus*> index_buses;
+    std::unordered_map<std::string, const Bus*> index_buses;
 };
 }
 // остановки лежат в дек

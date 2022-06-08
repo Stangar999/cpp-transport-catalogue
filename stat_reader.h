@@ -1,9 +1,22 @@
 ﻿#pragma once
 
+#include <iostream>
+#include <string>
+#include <vector>
 
-class stat_reader
+#include "input_reader.h"
+
+//struct Request{
+//    std::string type;
+//    std::string data;
+//};
+
+class StatrReader
 {
 public:
-    stat_reader();
+    StatrReader(std::istream &input);
+    std::vector<Request> GetRequests();
+    void PrintResult(BusInfo&& bus_inf);
+private:
+    std::vector<Request> requests;
 };
-
