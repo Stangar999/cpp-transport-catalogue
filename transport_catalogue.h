@@ -9,10 +9,12 @@
 //#include <deque>
 
 namespace TransportCatalogue {
+struct Bus;
 struct Stop{
     std::string stop;
     double shir;
     double dolg;
+    std::set<std::string> buses;
 };
 
 struct Bus{
@@ -34,25 +36,27 @@ public:
 
     void AddStop(std::string&& line);
 
-    void FindBus();
+    std::optional<const Bus*> FindBus(const std::string& bus_name) const ;
 
-    void FindStop();
+    std::optional<const Stop*> FindStop(const std::string& stop_name) const ;
 
-    BusInfo GetBusInfo(std::string name_bus);
+    BusInfo GetBusInfo(const std::string &name_bus) const;
+
+    StopInfo GetStopInfo(const std::string &name_stop) const;
 
     const std::deque<Stop> GetStops() const{
-        return stops;
+        return stops_;
     };
 
     const std::deque<Bus> GetBus() const{
-        return buses;
+        return buses_;
     };
 
 private:
-    std::deque<Stop> stops;
-    std::unordered_map<std::string, const Stop*> index_stops;
-    std::deque<Bus> buses;
-    std::unordered_map<std::string, const Bus*> index_buses;
+    std::deque<Stop> stops_;
+    std::unordered_map<std::string, const Stop*> index_stops_;
+    std::deque<Bus> buses_;
+    std::unordered_map<std::string, const Bus*> index_buses_;
 };
 }
 // остановки лежат в дек

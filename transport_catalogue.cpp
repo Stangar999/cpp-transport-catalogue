@@ -40,8 +40,8 @@ void TransportCatalogue::AddStop(std::string&& line) {
     pos_e = pos_e == -1 ? line.size() : pos_e; // что бы и пробелы удалять и последнюю цифру не отрезать
     double dol = stod(line.substr(pos_s, pos_e - pos_s));
 
-    stops.push_back({name_value, shir, dol});
-    index_stops[move(name_value)] = &stops.back();
+    stops_.push_back({name_value, shir, dol, {}});
+    index_stops_[move(name_value)] = &stops_.back();
 }
 //----------------------------------------------------------------------------
 void TransportCatalogue::AddBus(std::string&& line) {
@@ -49,7 +49,7 @@ void TransportCatalogue::AddBus(std::string&& line) {
     // название маршрута
     int pos_s = 0;
     int pos_e = line.find_first_of(':');
-    string name_value = line.substr(pos_s, pos_e);
+    string name_bus = line.substr(pos_s, pos_e);
     std::vector<const Stop*> stops;
     int ich = line.find('>');
     char ch = ich > 0 ? '>' : '-';
@@ -60,7 +60,9 @@ void TransportCatalogue::AddBus(std::string&& line) {
         string name_stop = line.substr(pos_s, (pos_e + 1) - pos_s);
         pos_e = pos_ch;
         try {
-           stops.push_back(index_stops.at(name_stop));
+           const Stop* ptr_stop = index_stops_.at(name_stop);
+           const_cast<Stop*>(ptr_stop)->buses.insert(name_bus);
+           stops.push_back(ptr_stop);
         } catch (...) {
             cout << "index_stops.at(name_stop)";
         }
@@ -73,16 +75,33 @@ void TransportCatalogue::AddBus(std::string&& line) {
             stops.push_back(*it);
         }
     }
-    buses.push_back({name_value, move(stops)});
-    index_buses[move(name_value)] = &buses.back();
+    buses_.push_back({name_bus, move(stops)});
+    index_buses_[move(name_bus)] = &buses_.back();
 }
 //----------------------------------------------------------------------------
-BusInfo TransportCatalogue::GetBusInfo(std::string name_bus)
+std::optional<const Bus*> TransportCatalogue::FindBus(const std::string &bus_name) const
 {
-    if(!index_buses.count(name_bus)){
+    if(!index_buses_.count(bus_name)){
+        return nullopt;
+    }
+    return index_buses_.at(bus_name);
+}
+//----------------------------------------------------------------------------
+std::optional<const Stop*> TransportCatalogue::FindStop(const std::string &stop_name) const
+{
+    if(!index_stops_.count(stop_name)){
+        return nullopt;
+    }
+    return index_stops_.at(stop_name);
+}
+//----------------------------------------------------------------------------
+BusInfo TransportCatalogue::GetBusInfo(const std::string& name_bus) const
+{
+    auto opt_bus = FindBus(name_bus);
+    if(!opt_bus.has_value()){
         return {name_bus};
     }
-    const Bus& bus = *index_buses.at(name_bus);
+    const Bus& bus = *opt_bus.value();
     size_t coutn_stops = bus.stops.size();
     assert(coutn_stops >= 2);
     double range = 0;
@@ -92,6 +111,16 @@ BusInfo TransportCatalogue::GetBusInfo(std::string name_bus)
                                   {bus.stops[i + 1]->shir, bus.stops[i + 1]->dolg} );
     }
     return {name_bus, coutn_stops, stops.size(), range};
+}
+//----------------------------------------------------------------------------
+StopInfo TransportCatalogue::GetStopInfo(const std::string &name_stop) const
+{
+    auto opt_stop = FindStop(name_stop);
+    if(!opt_stop.has_value()){
+        return {name_stop, true, {} };
+    }
+    const Stop& stop = *opt_stop.value();
+    return {name_stop, false, stop.buses};
 }
 //----------------------------------------------------------------------------
 } // namespace TransportCatalogue

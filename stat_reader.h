@@ -6,17 +6,13 @@
 
 #include "input_reader.h"
 
-//struct Request{
-//    std::string type;
-//    std::string data;
-//};
-
 class StatrReader
 {
 public:
     StatrReader(std::istream &input);
     std::vector<Request> GetRequests();
-    void PrintResult(BusInfo&& bus_inf);
+    void PrintResReqBus(BusInfo&& bus_inf);
+    void PrintResReqStop(StopInfo&& stop_inf);
 private:
     std::vector<Request> requests;
 };
