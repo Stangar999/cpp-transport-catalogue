@@ -2,43 +2,32 @@
 #include "stat_reader.h"
 
 using namespace std;
+
+namespace TransportCatalogue{
+namespace StatrReader{
 //----------------------------------------------------------------------------
-StatrReader::StatrReader(std::istream &input)
+StatReader::StatReader(std::istream &input)
 {
-    string count;
-    getline(input, count);
-    int icount = stoi(count);
-    requests.reserve(icount);
-    for(int i = 0; i < icount; ++i){
-        string line;
-        getline(input, line);
-        int pos_s = line.find_first_not_of(' ');
-        int pos_e = line.find_first_of(' ', pos_s);
-        string type_req = line.substr(pos_s, pos_e - pos_s);
-        assert(type_req == "Bus" || type_req == "Stop");
-        pos_s = line.find_first_not_of(' ', pos_e);
-//        pos_e = line.find_first_of(':', pos_s);
-//        string name_value = line.substr(pos_s, pos_e - pos_s);
-        string data = line.substr(pos_s, pos_e - pos_s);
-        requests.push_back( {type_req, data} );
-    }
+    InputReader::InputReader ir(input);
+    requests = ir.GetRequests();
 }
 //----------------------------------------------------------------------------
-std::vector<Request> StatrReader::GetRequests() {
+std::vector<InputReader::detail::Request> StatReader::GetRequests() {
     return move(requests);
 }
 //----------------------------------------------------------------------------
-void StatrReader::PrintResReqBus(BusInfo&& bus_inf)
+void StatReader::PrintResReqBus(InputReader::detail::BusInfo&& bus_inf)
 {
-    const auto &[name, count_stops, count_unic_stops, range] = bus_inf;
+    const auto &[name, count_stops, count_unic_stops, lengh, curvature] = bus_inf;
+            //cout << "adress 1" << &name << endl;
     if(!count_stops){
         cout << "Bus " << name << ": not found" << endl;
     } else {
-    cout << "Bus " << name << ": " << count_stops << " stops on route, " << count_unic_stops << " unique stops, " << range << " route length" << endl;
+    cout << "Bus " << name << ": " << count_stops << " stops on route, " << count_unic_stops << " unique stops, " << lengh << " route length, " << curvature << " curvature " << endl;
     }
 }
 //----------------------------------------------------------------------------
-void StatrReader::PrintResReqStop(StopInfo &&stop_inf)
+void StatReader::PrintResReqStop(InputReader::detail::StopInfo &&stop_inf)
 {
     const auto &[name, b_stop_is_not_exist, buses] = stop_inf;
     if(b_stop_is_not_exist){
@@ -54,3 +43,5 @@ void StatrReader::PrintResReqStop(StopInfo &&stop_inf)
     }
 }
 //----------------------------------------------------------------------------
+}// namespace StatrReader
+}// namespace TransportCatalogue

@@ -4,15 +4,20 @@
 #include <string>
 #include <vector>
 
-#include "input_reader.h"
+#include "input_reader.h"// приходиться подключать из за общих типов, как правильно?
 
-class StatrReader
+namespace TransportCatalogue{
+namespace StatrReader{
+class StatReader
 {
 public:
-    StatrReader(std::istream &input);
-    std::vector<Request> GetRequests();
-    void PrintResReqBus(BusInfo&& bus_inf);
-    void PrintResReqStop(StopInfo&& stop_inf);
+    StatReader(std::istream &input);
+    std::vector<InputReader::detail::Request> GetRequests();
+    void PrintResReqBus(InputReader::detail::BusInfo&& bus_inf);
+    void PrintResReqStop(InputReader::detail::StopInfo&& stop_inf);
 private:
-    std::vector<Request> requests;
+    std::vector<InputReader::detail::Request> requests;
 };
+
+}// namespace StatrReader
+}// namespace TransportCatalogue

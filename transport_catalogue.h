@@ -4,11 +4,13 @@
 #include <vector>
 #include <deque>
 #include <unordered_map>
+#include <math.h>
 
-#include  "input_reader.h"
-//#include <deque>
+#include  "input_reader.h"// приходиться подключать из за общих типов, как правильно?
 
 namespace TransportCatalogue {
+
+namespace detail {
 struct Bus;
 struct Stop{
     std::string stop;
@@ -22,43 +24,52 @@ struct Bus{
     std::vector<const Stop*> stops;
 };
 
-//struct request{
-//    std::string type;
-//    std::string data;
-//};
+class HasherStopes{
+public:
+    size_t operator()(std::pair<const Stop*, const Stop*> par) const {
+        size_t stop1 = std::hash<const void*>{}(par.first);
+        size_t stop2 = std::hash<const void*>{}(par.second);
+        return stop1*37 + stop2*pow(37,2);
+    }
+};
+}// namespace detail
 
 class TransportCatalogue
 {
 public:
-    TransportCatalogue(std::vector<Request>&& requests);
+    TransportCatalogue(std::vector<InputReader::detail::Request>&& requests);
 
     void AddBus(std::string&& line);
 
     void AddStop(std::string&& line);
 
-    std::optional<const Bus*> FindBus(const std::string& bus_name) const ;
+    void SetRangeStops(std::string&& line);
 
-    std::optional<const Stop*> FindStop(const std::string& stop_name) const ;
+    InputReader::detail::BusInfo GetBusInfo(const std::string &name_bus) const;
 
-    BusInfo GetBusInfo(const std::string &name_bus) const;
+    InputReader::detail::StopInfo GetStopInfo(const std::string &name_stop) const;
 
-    StopInfo GetStopInfo(const std::string &name_stop) const;
-
-    const std::deque<Stop> GetStops() const{
+    const std::deque<detail::Stop> GetStops() const {// для тестов
         return stops_;
     };
-
-    const std::deque<Bus> GetBus() const{
+    const std::deque<detail::Bus> GetBuses() const {// для тестов
         return buses_;
     };
 
+    std::size_t GetRangeStops(const detail::Stop* stop1, const detail::Stop* stop2) const ;
+
 private:
-    std::deque<Stop> stops_;
-    std::unordered_map<std::string, const Stop*> index_stops_;
-    std::deque<Bus> buses_;
-    std::unordered_map<std::string, const Bus*> index_buses_;
+    std::optional<const detail::Bus*> FindBus(const std::string& bus_name) const ;
+    std::optional<const detail::Stop*> FindStop(const std::string& stop_name) const ;
+    std::deque<detail::Stop> stops_;
+    std::unordered_map<std::string_view, const detail::Stop*> index_stops_;
+    std::deque<detail::Bus> buses_;
+    std::unordered_map<std::string_view, const detail::Bus*> index_buses_;
+    std::unordered_map<std::pair<const detail::Stop*, const detail::Stop*>, size_t, detail::HasherStopes> index_rage_;
 };
-}
+
+}// namespace TransportCatalogue
+
 // остановки лежат в дек
 // дополнительно для каждой остановки в unordered_map положить как ключ имя остановки(можно string_view), а значение адрес остановки в дек
 // маршруты лежат в дек

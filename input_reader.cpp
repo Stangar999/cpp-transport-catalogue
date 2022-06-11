@@ -2,13 +2,14 @@
 #include "input_reader.h"
 
 using namespace std;
-
+namespace TransportCatalogue{
+namespace InputReader{
 //----------------------------------------------------------------------------
 InputReader::InputReader(std::istream &input)
 {
     string count;
     getline(input, count);
-    int icount = stoi(count);
+    int icount = stoi(move(count));
     requests.reserve(icount);
     for(int i = 0; i < icount; ++i){
         string line;
@@ -18,14 +19,15 @@ InputReader::InputReader(std::istream &input)
         string type_req = line.substr(pos_s, pos_e - pos_s);
         assert(type_req == "Stop" || type_req == "Bus");
         pos_s = line.find_first_not_of(' ', pos_e);
-//        pos_e = line.find_first_of(':', pos_s);
-//        string name_value = line.substr(pos_s, pos_e - pos_s);
-        string data = line.substr(pos_s, pos_e - pos_s);
-        requests.push_back( {type_req, data} );
+        pos_e = line.find_last_not_of(' ');
+        string data = line.substr(pos_s, (pos_e + 1) - pos_s);
+        requests.push_back( {type_req, move(data)} );
     }
 }
 //----------------------------------------------------------------------------
-std::vector<Request> InputReader::GetRequests() {
+std::vector<detail::Request> InputReader::GetRequests() {
     return move(requests);
 }
 //----------------------------------------------------------------------------
+}// namespace InputReader
+}// namespace TransportCatalogue
