@@ -1,5 +1,5 @@
 ﻿#pragma once
-
+//тесты
 namespace tests{
 
 void TestStops();
