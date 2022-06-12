@@ -1,44 +1,39 @@
 ﻿#pragma once
 
+#include <cassert>
 #include <iostream>
 #include <string>
 #include <vector>
 #include <set>
+#include <map>
+#include "transport_catalogue.h"
 
 namespace TransportCatalogue{
 
-namespace InputReader{
-
 namespace detail{
+std::vector<::TransportCatalogue::detail::Request> ParseRequestOnType(std::istream &input);
 
-// используется и тут и в stat_reader, думал сосздать отдельный хедер common.h и там обьявить все общие типы, но в тренажер нельзя добавлять новые файлы, как правильно ???
-struct Request{
-    std::string type;
-    std::string data;
-};
-// используется и тут и в stat_reader, transport_catalogue.h думал сосздать отдельный хедер common.h и там обьявить все общие типы, но в тренажер нельзя добавлять новые файлы, как правильно ???
-struct BusInfo{
-    std::string bus_name;
-    std::size_t count_stops = 0;
-    std::size_t count_unic_stops = 0;
-    size_t length = 0;
-    double curvature = 0;
-};
-// используется и тут и в stat_reader, transport_catalogue.h думал сосздать отдельный хедер common.h и там обьявить все общие типы, но в тренажер нельзя добавлять новые файлы, как правильно ???
-struct StopInfo{
-    const std::string& stop_name;
-    bool b_stop_is_not_exist = false;
-    const std::set<std::string>& buses;
-};
-}// namespace detail
+std::string GetWord (const std::string& line, char ch_start, char ch_end, size_t& pos_start, size_t& pos_end);
+}
+namespace InputReader{
 
 class InputReader
 {
 public:
-    InputReader(std::istream &input);
+    InputReader(std::istream &input, TransportCatalogue& tc);
+
     std::vector<detail::Request> GetRequests();
+
 private:
+    std::tuple<detail::Bus, std::vector<std::string>> ParseRequestsBuses(const std::string& line);
+
+    detail::Stop ParseRequestsStops(const std::string& line);
+
+    void ParseRequestsStopsLenght(const std::string& line);
+
     std::vector<detail::Request> requests;
+
+    TransportCatalogue& tc_;
 };
 
 }// namespace InputReader

@@ -11,12 +11,13 @@ namespace StatrReader{
 class StatReader
 {
 public:
-    StatReader(std::istream &input);
-    std::vector<InputReader::detail::Request> GetRequests();
-    void PrintResReqBus(InputReader::detail::BusInfo&& bus_inf);
-    void PrintResReqStop(InputReader::detail::StopInfo&& stop_inf);
+    StatReader(std::istream &input, TransportCatalogue& tc, std::ostream &output);
+    std::vector<detail::Request> GetRequests();
+    void PrintResReqBus(detail::BusInfo&& bus_inf);
+    void PrintResReqStop(detail::StopInfo&& stop_inf);
 private:
-    std::vector<InputReader::detail::Request> requests;
+    std::vector<detail::Request> requests;
+    std::ostream &output_;
 };
 
 }// namespace StatrReader

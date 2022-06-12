@@ -6,40 +6,56 @@ using namespace std;
 namespace TransportCatalogue{
 namespace StatrReader{
 //----------------------------------------------------------------------------
-StatReader::StatReader(std::istream &input)
+StatReader::StatReader(std::istream &input, TransportCatalogue &tc, ostream &output)
+    :output_(output)
 {
-    InputReader::InputReader ir(input);
-    requests = ir.GetRequests();
+    requests = detail::ParseRequestOnType(input);
+    for(const auto& [type_req, data] : requests){
+        //cout << "adress 2" << &data << endl;
+        if(type_req == "Bus"s){
+            if(auto opt_bus = tc.FindBus(data); opt_bus){
+                PrintResReqBus(tc.GetBusInfo(opt_bus.value()));
+            } else {
+                PrintResReqBus({data});
+            }
+        } else {
+            if(auto opt_stop = tc.FindStop(data); opt_stop){
+                PrintResReqStop(tc.GetStopInfo(opt_stop.value()));
+            } else {
+                PrintResReqStop({data, true, nullopt});
+            }
+        }
+    }
 }
 //----------------------------------------------------------------------------
-std::vector<InputReader::detail::Request> StatReader::GetRequests() {
+std::vector<detail::Request> StatReader::GetRequests() {
     return move(requests);
 }
 //----------------------------------------------------------------------------
-void StatReader::PrintResReqBus(InputReader::detail::BusInfo&& bus_inf)
+void StatReader::PrintResReqBus(detail::BusInfo&& bus_inf)
 {
     const auto &[name, count_stops, count_unic_stops, lengh, curvature] = bus_inf;
             //cout << "adress 1" << &name << endl;
     if(!count_stops){
-        cout << "Bus " << name << ": not found" << endl;
+        output_ << "Bus " << name << ": not found" << endl;
     } else {
-    cout << "Bus " << name << ": " << count_stops << " stops on route, " << count_unic_stops << " unique stops, " << lengh << " route length, " << curvature << " curvature " << endl;
+    output_ << "Bus " << name << ": " << count_stops << " stops on route, " << count_unic_stops << " unique stops, " << lengh << " route length, " << curvature << " curvature " << endl;
     }
 }
 //----------------------------------------------------------------------------
-void StatReader::PrintResReqStop(InputReader::detail::StopInfo &&stop_inf)
+void StatReader::PrintResReqStop(detail::StopInfo &&stop_inf)
 {
     const auto &[name, b_stop_is_not_exist, buses] = stop_inf;
-    if(b_stop_is_not_exist){
-        cout << "Stop " << name << ": not found" << endl;
-    }else if(buses.empty()) {
-        cout << "Stop " << name << ": no buses" << endl;
+    if(b_stop_is_not_exist) {
+        output_ << "Stop " << name << ": not found" << endl;
+    } else if(!buses.has_value()) {
+        output_ << "Stop " << name << ": no buses" << endl;
     } else {
-        cout << "Stop " << name << ": buses";
-        for(const auto& bus_name: buses){
-            cout <<" "<< bus_name;
+        output_ << "Stop " << name << ": buses";
+        for(const auto& bus_name: buses.value()){
+            output_ << " " << bus_name;
         }
-        cout<< endl;
+        output_<< endl;
     }
 }
 //----------------------------------------------------------------------------
