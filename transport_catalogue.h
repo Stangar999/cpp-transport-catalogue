@@ -64,13 +64,13 @@ class TransportCatalogue
 public:
     TransportCatalogue();
 
-    void AddBus(detail::Bus bus);
+    void AddBus(const detail::Bus& bus);
 
-    void AddStop(detail::Stop stop);
+    void AddStop(const detail::Stop& stop);
 
-    void AddRangeStops(detail::StopsLenght stops_lenght);
+    void AddRangeStops(const detail::StopsLenght& stops_lenght);
 
-    void AddBuses_from_stop( std::string bus_name, std::vector<std::string> buses_from_stop );
+    void AddBusesFromStop(const std::string &bus_name, const std::vector<std::string>& buses_from_stop );
 
     detail::BusInfo GetBusInfo(const detail::Bus* bus) const;
 

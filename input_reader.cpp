@@ -21,10 +21,9 @@ InputReader::InputReader(std::istream &input, TransportCatalogue& tc):
         if (request.type == "Stop"){
             tc.AddStop(ParseRequestsStops(request.data));
         } else{
-            auto [bus, buses_from_stop] =  ParseRequestsBuses(request.data);
-            tc.AddBuses_from_stop(bus.name, move(buses_from_stop));
-            tc.AddBus(move(bus));
-
+            auto [bus, buses_from_stop] = ParseRequestsBuses(request.data);
+            tc.AddBusesFromStop(bus.name, buses_from_stop);
+            tc.AddBus(bus);
         }
     }
     for (auto& request : requests){
@@ -93,7 +92,7 @@ void InputReader::ParseRequestsStopsLenght(const std::string &line)
         }else{
             name_to_stop = line.substr(pos_s, pos_e - pos_s);
         }
-        tc_.AddRangeStops({name_from_stop, name_to_stop, static_cast<size_t>(stol(range))});
+        tc_.AddRangeStops( {name_from_stop, name_to_stop, static_cast<size_t>(stol(range))} );
     }
 }
 //----------------------------------------------------------------------------
