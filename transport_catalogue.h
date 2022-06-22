@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <iostream>
+#include <unordered_set>
 #include <vector>
 #include <deque>
 #include <set>
@@ -8,50 +9,15 @@
 #include <unordered_map>
 #include <math.h>
 
+#include "domain.h"
+
 namespace TransportCatalogue {
 
 namespace detail {
 
-struct Request{
-    std::string type;
-    std::string data;
-};
-
-struct BusInfo{
-    std::string name;
-    std::size_t count_stops = 0;
-    std::size_t count_unic_stops = 0;
-    size_t length = 0;
-    double curvature = 0;
-};
-
-struct StopInfo{
-    const std::string& name;
-    bool b_stop_is_not_exist = false;
-    std::optional<std::set<std::string>> buses;
-};
-
-struct Bus;
-struct Stop{
-    std::string name;
-    double lat;
-    double lng;
-};
-
-struct Bus{
-    std::string name;
-    std::vector<const Stop*> stops;
-};
-
-struct StopsLenght{
-    std::string from_stop;
-    std::string to_stop;
-    size_t lenght;
-};
-
 class HasherStopes{
 public:
-    size_t operator()(std::pair<const Stop*, const Stop*> par) const {
+    size_t operator()(std::pair<const domain::Stop*, const domain::Stop*> par) const {
         size_t from_stop = std::hash<const void*>{}(par.first);
         size_t to_stop = std::hash<const void*>{}(par.second);
         return from_stop*37 + to_stop*pow(37,2);
@@ -59,48 +25,59 @@ public:
 };
 }// namespace detail
 
+using namespace domain;
+
 class TransportCatalogue
 {
 public:
     TransportCatalogue();
 
-    void AddBus(const detail::Bus& bus);
+    void AddBus(const Bus& bus);
 
-    void AddStop(const detail::Stop& stop);
+    void AddStop(const Stop& stop);
 
-    void AddRangeStops(const detail::StopsLenght& stops_lenght);
+    void AddRangeStops(const StopsLenght& stops_lenght);
 
-    void AddBusesFromStop(const std::string &bus_name, const std::vector<std::string>& buses_from_stop );
+    //void AddBusesFromStop(const std::string &bus_name, const std::vector<std::string>& buses_from_stop );
 
-    detail::BusInfo GetBusInfo(const detail::Bus* bus) const;
+    void AddBusesFromStop(const Bus& bus);
 
-    detail::StopInfo GetStopInfo(const detail::Stop* stop) const;
+//    BusStat GetBusInfo(const Bus* bus) const;
 
-    const std::deque<detail::Stop> GetStops() const { // для тестов
+    //StopInfo GetStopInfo(const Stop* stop) const;
+
+     std::deque<Stop> GetStops() const { // для тестов
         return stops_;
     };
-    const std::deque<detail::Bus> GetBuses() const {// для тестов
+     std::deque<Bus> GetBuses() const {// для тестов
         return buses_;
     };
 
-    std::size_t GetRangeStops(const detail::Stop* from_stop, const detail::Stop* to_stop) const ;
+    std::size_t GetRangeStops(const Stop* from_stop, const Stop* to_stop) const ;
 
-    std::optional<const detail::Bus*> FindBus(const std::string& bus_name) const ;
+    std::optional<const Bus*> FindBus(std::string_view bus_name) const ;
 
-    std::optional<const detail::Stop*> FindStop(const std::string& stop_name) const ;
+    std::optional<const Stop*> FindStop(std::string_view stop_name) const ;
+
+    //const std::map<std::string_view, std::set<std::string_view>>& GetBusesFromStop() const;
+    const std::map<std::string_view, std::unordered_set<const Bus*>>& GetBusesFromStop() const;
 
 private:
-    std::deque<detail::Stop> stops_;
+    std::deque<Stop> stops_;
 
-    std::unordered_map<std::string_view, const detail::Stop*> index_stops_;
+    std::unordered_map<std::string_view, const Stop*> index_stops_;
 
-    std::deque<detail::Bus> buses_;
+    std::deque<Bus> buses_;
 
-    std::map<std::string, std::set<std::string>> buses_from_stop_;
+    //std::map<std::string, std::set<std::string>> buses_from_stop_;
 
-    std::unordered_map<std::string_view, const detail::Bus*> index_buses_;
+    //std::map<std::string_view, std::set<std::string_view>> buses_from_stop_;
 
-    std::unordered_map<std::pair<const detail::Stop*, const detail::Stop*>, size_t, detail::HasherStopes> index_rage_;
+    std::map<std::string_view, std::unordered_set<const Bus*>> buses_from_stop_; // нарушился алфавитный порядок
+
+    std::unordered_map<std::string_view, const Bus*> index_buses_;
+
+    std::unordered_map<std::pair<const Stop*, const Stop*>, size_t, detail::HasherStopes> index_rage_;
 };
 
 }// namespace TransportCatalogue
