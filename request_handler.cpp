@@ -7,11 +7,11 @@
  * Если вы затрудняетесь выбрать, что можно было бы поместить в этот файл,
  * можете оставить его пустым.
  */
-namespace RequestHandler
-{
+
 //----------------------------------------------------------------------------
-RequestHandler::RequestHandler(const TransportCatalogue::TransportCatalogue& db)
+RequestHandler::RequestHandler(const TransportCatalogue::TransportCatalogue& db, renderer::MapRenderer& renderer)
     :db_(db)
+    ,renderer_(renderer)
 {
 
 }
@@ -57,6 +57,56 @@ std::optional< const std::unordered_set<const domain::Bus*>* > RequestHandler::G
 
 }
 //----------------------------------------------------------------------------
+std::vector<const domain::Bus*> RequestHandler::GetBusesLex() const
+{
+    // использую сет как фильтр уникальных и сортировщик, кладу в вектор так как потом надо будет только итерироваться
+    std::set<const domain::Bus*, domain::CmpBuses> set;
+    for(const auto& bus : db_.GetBuses()){
+        set.insert(&bus);
+    }
+    return {set.begin(), set.end()};
+}
+//----------------------------------------------------------------------------
+const std::vector<const domain::Stop*> RequestHandler::GetUnicLexStopsIncludeBuses() const
+{
+    // использую сет как фильтр уникальных и сортировщик, кладу в вектор так как потом надо будет только итерироваться
+    std::set<const domain::Stop*, domain::CmpStops> set;
+    for(const auto& bus : db_.GetBuses()){
+        for(const auto& stop : bus.stops){
+            set.insert(stop);
+        }
+    }
+    return {set.begin(), set.end()};
+}
+//----------------------------------------------------------------------------
+//void RequestHandler::SetMapRendererBusesStops()
+//{
+//    renderer_.SetBusesStops(db_.GetBusesStops());
+//}
+//----------------------------------------------------------------------------
+//const std::map<std::string_view, const std::vector<const domain::Stop*>*>& RequestHandler::GetBusesStops() const
+//{
+//    return db_.GetBusesStops();
+//}
+//----------------------------------------------------------------------------
+//const std::vector<const domain::Stop*> RequestHandler::GetUnicStopsFromBus() const
+//{
+//    const auto& buses_stopes = db_.;
+//    // создаем перечень уникальных остановок входящими в маршруты в лекс порядке
+//    std::set<const domain::Stop*, domain::CmpStops> stopes;
+//    for(const auto& bus : buses_stopes){
+//        for(const domain::Stop* stop : *bus.second){
+//            stopes.insert(stop);
+//        }
+//    }
+//    return {stopes.begin(), stopes.end()};
+//}
+//----------------------------------------------------------------------------
+//svg::Document RequestHandler::RenderMap() const
+//{
+
+//}
+//----------------------------------------------------------------------------
 domain::BusStat RequestHandler::CreateBusStat(const domain::Bus* bus) const
 {
     size_t coutn_stops = bus->stops.size();
@@ -76,4 +126,3 @@ domain::BusStat RequestHandler::CreateBusStat(const domain::Bus* bus) const
     return {bus->name, coutn_stops, stops.size(), length, length / range};
 }
 //----------------------------------------------------------------------------
-}

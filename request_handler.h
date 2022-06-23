@@ -3,6 +3,7 @@
 
 #include "transport_catalogue.h"
 #include "domain.h"
+#include "map_renderer.h"
 
 /*
  * Здесь можно было бы разместить код обработчика запросов к базе, содержащего логику, которую не
@@ -19,13 +20,12 @@
 // с другими подсистемами приложения.
 // См. паттерн проектирования Фасад: https://ru.wikipedia.org/wiki/Фасад_(шаблон_проектирования)
 //using namespace TransportCatalogue;
-namespace RequestHandler
-{
+
 class RequestHandler {
 
 public:
     // MapRenderer понадобится в следующей части итогового проекта
-    RequestHandler(const TransportCatalogue::TransportCatalogue& db/*, const renderer::MapRenderer& renderer*/);
+    RequestHandler(const TransportCatalogue::TransportCatalogue& db, renderer::MapRenderer& renderer);
 
     // Возвращает информацию о маршруте (запрос Bus)
     std::optional<domain::BusStat> GetBusStat(const std::string_view& bus_name) const;
@@ -34,13 +34,24 @@ public:
     //std::optional< const std::set<std::string_view>* > GetBusesByStop(const std::string_view& stop_name) const;
     std::optional<const std::unordered_set<const domain::Bus*>*> GetBusesByStop(const std::string_view& stop_name) const;
 
-//    // Этот метод будет нужен в следующей части итогового проекта
+//    void SetMapRendererBusesStops();
+
+    // Возвращает перечень автобусов в лекс порядке и перечень их остановок в порядке следования
+//    const std::map<std::string_view, const std::vector<const domain::Stop*>*>& GetBusesStops() const ;
+
+    std::vector<const domain::Bus*> GetBusesLex() const;
+
+    // Возвращает перечень уникальных остановок в лекс порядке через которые проходят маршруты
+    const std::vector<const domain::Stop*> GetUnicLexStopsIncludeBuses() const ;
+
+    //const std::map<std::string_view, const std::vector<const domain::Stop*>*>& GetBusesStops() const;
+    // Этот метод будет нужен в следующей части итогового проекта
 //    svg::Document RenderMap() const;
 
 private:
     domain::BusStat CreateBusStat (const domain::Bus* bus) const;
     // RequestHandler использует агрегацию объектов "Транспортный Справочник" и "Визуализатор Карты"
     const TransportCatalogue::TransportCatalogue& db_;
-//    const renderer::MapRenderer& renderer_;
+
+    renderer::MapRenderer& renderer_;
 };
-}

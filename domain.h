@@ -11,6 +11,7 @@ namespace MainReq{
 using namespace std::literals;
     const std::string base = "base_requests"s;
     const std::string stat = "stat_requests"s;
+    const std::string render_settings = "render_settings"s;
 
     const std::string type = "type"s;
 
@@ -61,9 +62,22 @@ struct Stop{
     double lng;
 };
 
+struct CmpStops{
+    bool operator()(const domain::Stop* lth, const domain::Stop* rth ) const {
+        return lth->name < rth->name;
+    }
+};
+
 struct Bus{
     std::string name;
     std::vector<const Stop*> stops;
+    bool is_round;
+};
+
+struct CmpBuses{
+    bool operator()(const domain::Bus* lth, const domain::Bus* rth ) const {
+        return lth->name < rth->name;
+    }
 };
 
 struct StopsLenght{

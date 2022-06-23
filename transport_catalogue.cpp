@@ -54,6 +54,7 @@ size_t TransportCatalogue::GetRangeStops(const Stop* from_stop, const Stop* to_s
 void TransportCatalogue::AddBus(const Bus& bus) {
     buses_.push_back(move(bus));
     index_buses_[buses_.back().name] = &buses_.back();
+    //buses_stops_[buses_.back().name] = &buses_.back().stops; // для рисования маршрутов по лексиграфическому порядку
 
     AddBusesFromStop(buses_.back());
 }
@@ -80,6 +81,15 @@ const std::map<std::string_view, std::unordered_set<const Bus*>>& TransportCatal
 {
     return buses_from_stop_;
 }
+//----------------------------------------------------------------------------
+const std::deque<Bus>& TransportCatalogue::GetBuses() const
+{
+    return buses_;
+}
+//const std::map<std::string_view, const std::vector<const Stop*>*>& TransportCatalogue::GetBusesStops() const
+//{
+//    return buses_stops_;
+//}
 //----------------------------------------------------------------------------
 //BusStat TransportCatalogue::GetBusInfo(const Bus* bus) const {
 //    size_t coutn_stops = bus->stops.size();

@@ -2,12 +2,14 @@
 
 //#include "input_reader.h"
 //#include "stat_reader.h"
-#include "transport_catalogue.h"
+//#include "transport_catalogue.h"
 #include "json_reader.h"
+#include "map_renderer.h"
+#include "request_handler.h"
 //#include "tests.h"
 
 using namespace std;
-using namespace TransportCatalogue;
+//using namespace TransportCatalogue;
 
 int main() {
     /*
@@ -19,7 +21,11 @@ int main() {
      * с ответами.
      * Вывести в stdout ответы в виде JSON
      */
-    JsonReader::JsonReader j_r(cin);
+    TransportCatalogue::TransportCatalogue db;
+    renderer::MapRenderer rend;
+    RequestHandler req_hand(db, rend);
+    JsonReader::JsonReader j_r(cin, db, req_hand, rend);
+    rend.DrawMapBus();
 }
 
 //int main()

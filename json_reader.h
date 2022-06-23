@@ -3,6 +3,8 @@
 
 #include "json.h"
 #include "transport_catalogue.h"
+#include "request_handler.h"
+#include "map_renderer.h"
 
 /*
  * Здесь можно разместить код наполнения транспортного справочника данными из JSON,
@@ -14,7 +16,9 @@ namespace JsonReader
 class JsonReader
 {
 public:
-    JsonReader(std::istream& in);
+    JsonReader(std::istream& in, TransportCatalogue::TransportCatalogue& db,
+               const RequestHandler& req_hand,
+               renderer::MapRenderer& renderer);
 private:
     void ParseRequestsBase(json::Array&& vec_map);
 
@@ -28,13 +32,19 @@ private:
 
     void ExecRequestsStat(std::vector<domain::RequestOut>&& requests);
 
+    void ParseRequestsRendSett(const json::Dict&& map);
+
     json::Dict PrintResReqBus(std::optional<domain::BusStat>&& bus_stat_opt, int id);
 
     //json::Dict PrintResReqStop(std::optional< const std::set<std::string_view>* > buses_opt, int id);
 
     json::Dict PrintResReqStop(std::optional<const std::unordered_set<const domain::Bus*>*> buses_opt, int id);
 
-    TransportCatalogue::TransportCatalogue tr_cat_;
+    TransportCatalogue::TransportCatalogue& db_;
+
+    const RequestHandler& req_hand_;
+
+    renderer::MapRenderer& renderer_;
 };
 
 }// namespace JsonReader
