@@ -1,13 +1,5 @@
 ﻿#include "request_handler.h"
 
-/*
- * Здесь можно было бы разместить код обработчика запросов к базе, содержащего логику, которую не
- * хотелось бы помещать ни в transport_catalogue, ни в json reader.
- *
- * Если вы затрудняетесь выбрать, что можно было бы поместить в этот файл,
- * можете оставить его пустым.
- */
-
 //----------------------------------------------------------------------------
 RequestHandler::RequestHandler(const TransportCatalogue::TransportCatalogue& db, renderer::MapRenderer& renderer)
     :db_(db)
@@ -25,22 +17,6 @@ std::optional<domain::BusStat> RequestHandler::GetBusStat(const std::string_view
     }
 }
 //----------------------------------------------------------------------------
-
-//std::optional< const std::set<std::string_view>* > RequestHandler::GetBusesByStop(const std::string_view& stop_name) const
-//{
-//    if(auto opt_stop = db_.FindStop(stop_name); opt_stop){
-//        if(db_.GetBusesFromStop().count(stop_name) != 0 ){
-//            return &db_.GetBusesFromStop().at(stop_name) ;
-//        } else {
-//            static std::set<std::string_view> emp{};
-//            return &emp;
-//        }
-//    } else {
-//        // если остановок с таким именем нет
-//        return std::nullopt;
-//    }
-
-//}
 std::optional< const std::unordered_set<const domain::Bus*>* > RequestHandler::GetBusesByStop(const std::string_view& stop_name) const
 {
     if(auto opt_stop = db_.FindStop(stop_name); opt_stop){
@@ -79,33 +55,10 @@ const std::vector<const domain::Stop*> RequestHandler::GetUnicLexStopsIncludeBus
     return {set.begin(), set.end()};
 }
 //----------------------------------------------------------------------------
-//void RequestHandler::SetMapRendererBusesStops()
-//{
-//    renderer_.SetBusesStops(db_.GetBusesStops());
-//}
-//----------------------------------------------------------------------------
-//const std::map<std::string_view, const std::vector<const domain::Stop*>*>& RequestHandler::GetBusesStops() const
-//{
-//    return db_.GetBusesStops();
-//}
-//----------------------------------------------------------------------------
-//const std::vector<const domain::Stop*> RequestHandler::GetUnicStopsFromBus() const
-//{
-//    const auto& buses_stopes = db_.;
-//    // создаем перечень уникальных остановок входящими в маршруты в лекс порядке
-//    std::set<const domain::Stop*, domain::CmpStops> stopes;
-//    for(const auto& bus : buses_stopes){
-//        for(const domain::Stop* stop : *bus.second){
-//            stopes.insert(stop);
-//        }
-//    }
-//    return {stopes.begin(), stopes.end()};
-//}
-//----------------------------------------------------------------------------
-//svg::Document RequestHandler::RenderMap() const
-//{
-
-//}
+svg::Document RequestHandler::RenderMap() const
+{
+    return renderer_.GetDocMapBus();
+}
 //----------------------------------------------------------------------------
 domain::BusStat RequestHandler::CreateBusStat(const domain::Bus* bus) const
 {

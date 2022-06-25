@@ -12,6 +12,7 @@
 */
 namespace JsonReader
 {
+using namespace std::literals;
 
 class JsonReader
 {
@@ -36,9 +37,9 @@ private:
 
     json::Dict PrintResReqBus(std::optional<domain::BusStat>&& bus_stat_opt, int id);
 
-    //json::Dict PrintResReqStop(std::optional< const std::set<std::string_view>* > buses_opt, int id);
-
     json::Dict PrintResReqStop(std::optional<const std::unordered_set<const domain::Bus*>*> buses_opt, int id);
+
+    json::Dict PrintResReqMap(std::optional<svg::Document>&& doc_opt, int id);
 
     TransportCatalogue::TransportCatalogue& db_;
 

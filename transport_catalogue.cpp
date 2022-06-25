@@ -28,15 +28,8 @@ void TransportCatalogue::AddRangeStops(const StopsLenght& stops_lenght) {
     }
 }
 //----------------------------------------------------------------------------
-//void TransportCatalogue::AddBusesFromStop(const std::string& bus_name, const std::vector<std::string>& buses_from_stop ) {
-//    for(const auto& stop: buses_from_stop){
-//        buses_from_stop_[move(stop)].insert(bus_name);
-//    }
-//}
-//----------------------------------------------------------------------------
 void TransportCatalogue::AddBusesFromStop(const Bus& bus) {
     for(const auto& stop: bus.stops){
-        //buses_from_stop_[stop->name].insert(bus.name);
         buses_from_stop_[stop->name].insert(&bus);
     }
 }
@@ -54,8 +47,6 @@ size_t TransportCatalogue::GetRangeStops(const Stop* from_stop, const Stop* to_s
 void TransportCatalogue::AddBus(const Bus& bus) {
     buses_.push_back(move(bus));
     index_buses_[buses_.back().name] = &buses_.back();
-    //buses_stops_[buses_.back().name] = &buses_.back().stops; // для рисования маршрутов по лексиграфическому порядку
-
     AddBusesFromStop(buses_.back());
 }
 //----------------------------------------------------------------------------
@@ -73,10 +64,6 @@ std::optional<const Stop*> TransportCatalogue::FindStop(std::string_view stop_na
     return index_stops_.at(stop_name);
 }
 //----------------------------------------------------------------------------
-//const std::map<std::string_view, std::set<std::string_view>>& TransportCatalogue::GetBusesFromStop() const
-//{
-//    return buses_from_stop_;
-//}
 const std::map<std::string_view, std::unordered_set<const Bus*>>& TransportCatalogue::GetBusesFromStop() const
 {
     return buses_from_stop_;
@@ -86,35 +73,5 @@ const std::deque<Bus>& TransportCatalogue::GetBuses() const
 {
     return buses_;
 }
-//const std::map<std::string_view, const std::vector<const Stop*>*>& TransportCatalogue::GetBusesStops() const
-//{
-//    return buses_stops_;
-//}
-//----------------------------------------------------------------------------
-//BusStat TransportCatalogue::GetBusInfo(const Bus* bus) const {
-//    size_t coutn_stops = bus->stops.size();
-//    if(coutn_stops < 2){
-//        throw "coutn_stops < 2";
-//    }
-//    size_t length = 0;
-//    double range = 0;
-//    set<const Stop*> stops(bus->stops.begin(), bus->stops.end());
-//    for(size_t i = 0, j = 1; j < coutn_stops; ++i, ++j){
-//        const Stop* from_stop  = bus->stops[i];
-//        const Stop* to_stop = bus->stops[j];
-//        length += GetRangeStops(from_stop, to_stop);
-//        range += domain::ComputeDistance( from_stop->lat, from_stop->lng,
-//                                            to_stop->lat, to_stop->lng );
-//    }
-//    return {bus->name, coutn_stops, stops.size(), length, length / range};
-//}
-//----------------------------------------------------------------------------
-//StopInfo TransportCatalogue::GetStopInfo(const Stop* stop) const {
-//    if(buses_from_stop_.count(stop->name) != 0 ){
-//        return {stop->name, false, buses_from_stop_.at(stop->name)};
-//    } else {
-//        return {stop->name, false, nullopt};
-//    }
-//}
 //----------------------------------------------------------------------------
 } // namespace TransportCatalogue

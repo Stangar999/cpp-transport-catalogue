@@ -1,5 +1,6 @@
 ﻿#include <algorithm>
 #include <ostream>
+#include <sstream>
 
 #include "json_reader.h"
 
@@ -26,22 +27,15 @@ JsonReader::JsonReader(std::istream &in,
     if(auto it = main_map.find(MainReq::base); it != main_map.end()){
         auto vec_map = std::move(it->second.AsArray());
         ParseRequestsBase(std::move(vec_map));
-    } else {
-        //std::cout << MainReq::base + " empty" << std::endl;
     }
-//    if(auto it = main_map.find(MainReq::stat); it != main_map.end()){
-//        auto vec_map = std::move(it->second.AsArray());
-//        ParseRequestsStat(vec_map);
-//    } else {
-//        std::cout << MainReq::stat + " empty" << std::endl;
-//    }
     if(auto it = main_map.find(MainReq::render_settings); it != main_map.end()){
         auto map = std::move(it->second.AsMap());
         ParseRequestsRendSett(std::move(map));
-    } else {
-        //std::cout << MainReq::render_settings + " empty" << std::endl;
     }
-    //int a  = 0;
+    if(auto it = main_map.find(MainReq::stat); it != main_map.end()){
+        auto vec_map = std::move(it->second.AsArray());
+        ParseRequestsStat(vec_map);
+    }
 }
 //----------------------------------------------------------------------------
 void JsonReader::ParseRequestsBase(json::Array&& vec_map)
@@ -57,9 +51,7 @@ void JsonReader::ParseRequestsBase(json::Array&& vec_map)
         if(const auto& map_type_stop = map_type_data.AsMap(); map_type_stop.at(MainReq::type).AsString() == MainReq::stop){
             db_.AddStop(ParseRequestsStops(map_type_stop));
         } else {
-            //auto [bus, buses_from_stop] = ParseRequestsBuses(map_type_data.AsMap());
             auto bus =  ParseRequestsBuses(map_type_data.AsMap());
-            //tr_cat_.AddBusesFromStop(bus.name, buses_from_stop);
             db_.AddBus(bus);
         }
     }
@@ -79,7 +71,8 @@ void JsonReader::ParseRequestsStat(const json::Array& vec_map)
     requests.reserve(vec_map.size());
     for(const auto& req : vec_map){
         const auto cur_req = req.AsMap();
-        requests.push_back( { std::move(cur_req.at(MainReq::id).AsInt()), std::move(cur_req.at(MainReq::type).AsString()), std::move(cur_req.at(MainReq::name).AsString()) } );
+        requests.push_back( { std::move(cur_req.at(MainReq::id).AsInt()), std::move(cur_req.at(MainReq::type).AsString()),
+                              cur_req.count(MainReq::name) != 0 ? std::move(cur_req.at(MainReq::name).AsString()) : "" } );
     }
     ExecRequestsStat(std::move(requests));
 }
@@ -88,11 +81,12 @@ void JsonReader::ExecRequestsStat(std::vector<domain::RequestOut>&& requests)
 {
     json::Array vec;
     for(const auto& req : requests){
-        //req_hand_(tr_cat_);
         if(req.type == domain::MainReq::stop){
             vec.emplace_back(PrintResReqStop(req_hand_.GetBusesByStop(req.name), req.id));
-        } else {
+        } else if(req.type == domain::MainReq::bus) {
             vec.emplace_back(PrintResReqBus(req_hand_.GetBusStat(req.name), req.id));
+        } else if(req.type == domain::MainReq::map) {
+            vec.emplace_back(PrintResReqMap(req_hand_.RenderMap(), req.id));
         }
     }
     json::Print(json::Document{json::Node{vec}}, std::cout);
@@ -193,11 +187,9 @@ domain::Bus JsonReader::ParseRequestsBuses(const json::Dict& req)
     if(req.at(MainReq::type).AsString() == MainReq::bus){
         try{
             std::vector<const domain::Stop*> stops;
-            //std::vector<std::string> buses_from_stop;
             for(const auto& stop_name : req.at(MainReq::stops).AsArray()){
                 const auto& str_stop_name = stop_name.AsString();
                 try {
-                    //buses_from_stop.push_back(str_stop_name);
                     stops.push_back(db_.FindStop(str_stop_name).value());
                 } catch (...) {
                     std::cout << "tc_.FindStop(name_stop).value()";
@@ -240,7 +232,6 @@ void JsonReader::ParseRequestsStopsLenght(const json::Dict& req)
 //----------------------------------------------------------------------------
 json::Dict JsonReader::PrintResReqBus(std::optional<domain::BusStat>&& bus_stat_opt, int id)
 {
-    using namespace std::literals;
     if(bus_stat_opt){
         const auto &[name, count_stops, count_unic_stops, lengh, curvature] = *bus_stat_opt;
         return json::Dict{{"curvature"s, curvature},
@@ -254,28 +245,8 @@ json::Dict JsonReader::PrintResReqBus(std::optional<domain::BusStat>&& bus_stat_
     }
 }
 //----------------------------------------------------------------------------
-//json::Dict JsonReader::PrintResReqStop(std::optional< const std::set<std::string_view>* > buses_opt, int id)
-//{
-//    using namespace std::literals;
-//    if(buses_opt){
-//        const auto& buses = *buses_opt;
-//        json::Array vec;
-//        vec.reserve(buses->size());
-//        for(const auto& bus : *buses){
-//            vec.push_back(std::string(bus));
-//        }
-//        return json::Dict{{"buses"s, vec},
-//                       {"request_id"s, id } };
-//        //json::Print(json::Document{json::Node{map}}, std::cout);
-//    } else {
-//        return json::Dict{{"request_id"s, id },
-//                       {"error_message"s, "not found" } };
-//        //json::Print(json::Document{json::Node{map}}, std::cout);
-//    }
-//}
 json::Dict JsonReader::PrintResReqStop(std::optional< const std::unordered_set<const domain::Bus*>* > buses_opt, int id)
 {
-    using namespace std::literals;
     if(buses_opt){
         const auto& buses = *buses_opt;
         // для сортировки по возрастанию
@@ -290,12 +261,21 @@ json::Dict JsonReader::PrintResReqStop(std::optional< const std::unordered_set<c
         }
         return json::Dict{{"buses"s, vec},
                        {"request_id"s, id } };
-        //json::Print(json::Document{json::Node{map}}, std::cout);
     } else {
         return json::Dict{{"request_id"s, id },
                        {"error_message"s, "not found" } };
-        //json::Print(json::Document{json::Node{map}}, std::cout);
     }
+}
+//----------------------------------------------------------------------------
+json::Dict JsonReader::PrintResReqMap(std::optional<svg::Document>&& doc_opt, int id)
+{
+    if(!doc_opt){
+        return {};
+    }
+    const auto& doc = doc_opt.value();
+    std::ostringstream str;
+    doc.Render(str);
+    return json::Dict{{"map"s, str.str()}, {"request_id"s, id } };
 }
 //----------------------------------------------------------------------------
 }// namespace JsonReader

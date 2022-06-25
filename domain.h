@@ -25,6 +25,8 @@ using namespace std::literals;
     const std::string lon = "longitude"s;
     const std::string road_distances = "road_distances"s;
 
+    const std::string map = "Map"s;
+
     const std::string id = "id"s;
 
 }

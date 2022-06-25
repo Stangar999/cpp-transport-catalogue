@@ -26,13 +26,7 @@ struct Point {
     double y = 0;
 };
 
-//using Color = std::string;
-
 using Color = std::variant<std::monostate, std::string, Rgb, Rgba>;
-// Объявив в заголовочном файле константу со спецификатором inline,
-// мы сделаем так, что она будет одной на все единицы трансляции,
-// которые подключают этот заголовок.
-// В противном случае каждая единица трансляции будет использовать свою копию этой константы
 
 struct Rgb {
 public:
@@ -261,9 +255,6 @@ public:
     // Добавляет очередную вершину к ломаной линии
     Polyline& AddPoint(Point point);
 
-    /*
-     * Прочие методы и данные, необходимые для реализации элемента <polyline>
-     */
 private:
     void RenderObject(const RenderContext& context) const override;
 
@@ -294,7 +285,6 @@ public:
     // Задаёт текстовое содержимое объекта (отображается внутри тега text)
     Text& SetData(std::string data);
 
-    // Прочие данные и методы, необходимые для реализации элемента <text>
 private:
     void RenderObject(const RenderContext& context) const override;
 
@@ -329,7 +319,6 @@ public:
     void Render(std::ostream& out) const;
 
 private:
-    // Прочие методы и данные, необходимые для реализации класса Document
     std::vector<std::unique_ptr<Object>>objects_;
 };
 

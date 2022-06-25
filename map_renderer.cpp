@@ -19,23 +19,13 @@ void MapRenderer::SetBuses(std::vector<const domain::Bus*>&& buses)
     buses_ = std::move(buses);
 }
 //----------------------------------------------------------------------------
-//void MapRenderer::SetBuses(busesstopes& buses_stopes) {
-//    buses_stopes_ = &buses_stopes;
-//}
-//----------------------------------------------------------------------------
 SphereProjector MapRenderer::CreateProj() {
     // создаем вектор со всеми остановками входящими в маршруты
     std::vector<geo::Coordinates> vec_common_coord;
     vec_common_coord.reserve(stopes_.size());
-//    for(const auto& bus : buses_){
-//        for(const auto& stop : bus->stops){
-//            vec_common_coord.push_back({stop->lat, stop->lng});
-//        }
-//    }
     for(const auto& stop : stopes_){
         vec_common_coord.push_back({stop->lat, stop->lng});
     }
-
     // Создаём проектор сферических координат на карту
     return SphereProjector{ vec_common_coord.begin(), vec_common_coord.end(),
                 render_settings_.width, render_settings_.height, render_settings_.padding };
@@ -79,7 +69,7 @@ void MapRenderer::DrawNameBuses(svg::Document& doc, const SphereProjector& proj)
             counter_color = 0;
         }
         DrawNameBus(doc, proj, {stop->lat, stop->lng}, fill_color, bus->name);
-        if(!bus->is_round  /*stop != bus->stops.back()*/){
+        if(!bus->is_round ){
             size_t id = std::ceil(bus->stops.size() / 2); // ATTENTION
             // если остановки начала и конца не равны подписываем остановку конца
             if(stop != bus->stops[id]){
@@ -151,7 +141,7 @@ void MapRenderer::SetUnicStops(const std::vector<const domain::Stop*>&& stopes) 
     stopes_ = std::move(stopes);
 }
 //----------------------------------------------------------------------------
-void MapRenderer::DrawMapBus()
+svg::Document MapRenderer::GetDocMapBus()
 {
     svg::Document doc;
     SphereProjector proj = CreateProj();
@@ -159,7 +149,7 @@ void MapRenderer::DrawMapBus()
     DrawNameBuses(doc, proj);
     DrawCircStopes(doc, proj);
     DrawNameStopes(doc, proj);
-    doc.Render(std::cout);
+    return doc;
 }
 //----------------------------------------------------------------------------
 }// namespace MapRenderer

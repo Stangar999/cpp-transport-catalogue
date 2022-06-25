@@ -167,7 +167,7 @@ public:
     // Устанавливае перечень уникальных остановок в лекс поряд используемых в маршрутах
     void SetUnicStops(const std::vector<const domain::Stop*>&& stopes);
 
-    void DrawMapBus();
+    svg::Document GetDocMapBus();
 
 private:
 

@@ -31,10 +31,7 @@ public:
     std::optional<domain::BusStat> GetBusStat(const std::string_view& bus_name) const;
 
     // Возвращает маршруты, проходящие через
-    //std::optional< const std::set<std::string_view>* > GetBusesByStop(const std::string_view& stop_name) const;
     std::optional<const std::unordered_set<const domain::Bus*>*> GetBusesByStop(const std::string_view& stop_name) const;
-
-//    void SetMapRendererBusesStops();
 
     // Возвращает перечень автобусов в лекс порядке и перечень их остановок в порядке следования
 //    const std::map<std::string_view, const std::vector<const domain::Stop*>*>& GetBusesStops() const ;
@@ -44,13 +41,11 @@ public:
     // Возвращает перечень уникальных остановок в лекс порядке через которые проходят маршруты
     const std::vector<const domain::Stop*> GetUnicLexStopsIncludeBuses() const ;
 
-    //const std::map<std::string_view, const std::vector<const domain::Stop*>*>& GetBusesStops() const;
-    // Этот метод будет нужен в следующей части итогового проекта
-//    svg::Document RenderMap() const;
+    svg::Document RenderMap() const;
 
 private:
     domain::BusStat CreateBusStat (const domain::Bus* bus) const;
-    // RequestHandler использует агрегацию объектов "Транспортный Справочник" и "Визуализатор Карты"
+
     const TransportCatalogue::TransportCatalogue& db_;
 
     renderer::MapRenderer& renderer_;
