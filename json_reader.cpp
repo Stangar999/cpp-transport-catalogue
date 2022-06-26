@@ -174,7 +174,7 @@ domain::Stop JsonReader::ParseRequestsStops(const json::Dict &req)
 {
     using namespace domain;
     try{
-        return {req.at(MainReq::name).AsString(), req.at(MainReq::lat).AsDouble(), req.at(MainReq::lon).AsDouble()};
+        return {req.at(MainReq::name).AsString(), {req.at(MainReq::lat).AsDouble(), req.at(MainReq::lon).AsDouble()}};
     } catch (...) {
         std::cout << "Fail Stop" << std::endl;
         throw;

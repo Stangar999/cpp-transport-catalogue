@@ -35,12 +35,7 @@ std::optional< const std::unordered_set<const domain::Bus*>* > RequestHandler::G
 //----------------------------------------------------------------------------
 std::vector<const domain::Bus*> RequestHandler::GetBusesLex() const
 {
-    // использую сет как фильтр уникальных и сортировщик, кладу в вектор так как потом надо будет только итерироваться
-    std::set<const domain::Bus*, domain::CmpBuses> set;
-    for(const auto& bus : db_.GetBuses()){
-        set.insert(&bus);
-    }
-    return {set.begin(), set.end()};
+    return db_.GetBusesLex();
 }
 //----------------------------------------------------------------------------
 const std::vector<const domain::Stop*> RequestHandler::GetUnicLexStopsIncludeBuses() const
@@ -62,20 +57,10 @@ svg::Document RequestHandler::RenderMap() const
 //----------------------------------------------------------------------------
 domain::BusStat RequestHandler::CreateBusStat(const domain::Bus* bus) const
 {
-    size_t coutn_stops = bus->stops.size();
-    if(coutn_stops < 2){
-        throw "coutn_stops < 2";
-    }
-    size_t length = 0;
-    double range = 0;
-    std::set<const domain::Stop*> stops(bus->stops.begin(), bus->stops.end());
-    for(size_t i = 0, j = 1; j < coutn_stops; ++i, ++j){
-        const domain::Stop* from_stop  = bus->stops[i];
-        const domain::Stop* to_stop = bus->stops[j];
-        length += db_.GetRangeStops(from_stop, to_stop);
-        range += domain::ComputeDistance( from_stop->lat, from_stop->lng,
-                                            to_stop->lat, to_stop->lng );
-    }
-    return {bus->name, coutn_stops, stops.size(), length, length / range};
+   // изначально подумал о переносе в структуру Bus или BusStat
+   // но пернес в TransportCatalogue так как в методе используется из него GetRangeStops
+   // а делать зависимость Bus или BusStat от TransportCatalogue я подумал неверно
+
+   return db_.GetBusStat(bus);
 }
 //----------------------------------------------------------------------------

@@ -22,6 +22,7 @@ int main() {
     // MapRenderer как  понимаю должет формировать Document из данных переданных из RequestHandler, что бы не зависеть от TransportCatalogue,
     // и передача осуществляется в JsonReader, а еще JsonReader вызывает печать, и получается на нем все функции координации, а в main только все создается
     // Все это запутанно получается и как то странно
+    // у меня правльно организован порядок вызова и места вызовов начала расчета, печати и тд?
     TransportCatalogue::TransportCatalogue db;
     renderer::MapRenderer rend;
     RequestHandler req_hand(db, rend);

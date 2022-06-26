@@ -24,6 +24,7 @@ public:
 class Node {
 public:
     using Value = std::variant<std::nullptr_t, int, double, std::string, bool, Array, Dict>;
+
     Node() = default;
     Node(Value value);
 

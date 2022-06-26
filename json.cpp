@@ -151,10 +151,6 @@ Node LoadString(std::istream& input) {
 }
 
 std::string AddEscapeInString(std::string str) {
-
-    std::string strf = "\"\\r\\n\t\\\"\\\\\""s;
-    std::string strg = "\"Hello, \\\"everybody\\\"\""s;
-
     using namespace std::literals;
 
     auto it = str.begin();
@@ -266,76 +262,43 @@ bool Node::IsInt() const
 {
     // std::get_if вернёт указатель на значение нужного типа
     // либо nullptr, если variant содержит значение другого типа.
-    if (get_if<int>(&value_)) {
-        return true;
-    } else {
-        return false;
-    }
+    return get_if<int>(&value_) != nullptr;
+
 }
 
 bool Node::IsDouble() const
 {
-    if (get_if<double>(&value_) || get_if<int>(&value_)) {
-        return true;
-    } else {
-        return false;
-    }
+    return ( (get_if<double>(&value_) != nullptr) || (get_if<int>(&value_) != nullptr) );
 }
 
 bool Node::IsPureDouble() const
 {
-    if (get_if<double>(&value_)) {
-        return true;
-    } else {
-        return false;
-    }
+    return get_if<double>(&value_) != nullptr;
 }
 
 bool Node::IsBool() const
 {
-    if (get_if<bool>(&value_)) {
-        return true;
-    } else {
-        return false;
-    }
+    return get_if<bool>(&value_) != nullptr;
 }
 
 bool Node::IsString() const
 {
-    if (get_if<std::string>(&value_)) {
-        return true;
-    } else {
-        return false;
-    }
+    return get_if<std::string>(&value_) != nullptr;
 }
 
 bool Node::IsNull() const
 {
-    // std::get_if вернёт указатель на значение нужного типа
-    // либо nullptr, если variant содержит значение другого типа.
-    if (get_if<nullptr_t>(&value_)) {
-        return true;
-    } else {
-        return false;
-    }
+    return get_if<nullptr_t>(&value_) != nullptr; // ATTENTION
 }
 
 bool Node::IsArray() const
 {
-    if (get_if<Array>(&value_)) {
-        return true;
-    } else {
-        return false;
-    }
+    return get_if<Array>(&value_) != nullptr;
 }
 
 bool Node::IsMap() const
 {
-    if (get_if<Dict>(&value_)) {
-        return true;
-    } else {
-        return false;
-    }
+    return get_if<Dict>(&value_) != nullptr;
 }
 
 const Array& Node::AsArray() const {
@@ -343,64 +306,48 @@ const Array& Node::AsArray() const {
         // Когда мы убедились, что variant сейчас хранит double,
         // можно смело брать это значение при помощи std::get.
         return get<Array>(value_);
-    } else {
-        throw std::logic_error("holds_alternative<std::string>(value_)");
     }
+    throw std::logic_error("holds_alternative<std::string>(value_)");
 }
 
 const Dict& Node::AsMap() const {
     if (holds_alternative<Dict>(value_)) {
-        // Когда мы убедились, что variant сейчас хранит double,
-        // можно смело брать это значение при помощи std::get.
         return get<Dict>(value_);
-    } else {
-        throw std::logic_error("holds_alternative<std::string>(value_)");
     }
+    throw std::logic_error("holds_alternative<std::string>(value_)");
 }
 
 int Node::AsInt() const {
     if (holds_alternative<int>(value_)) {
-        // Когда мы убедились, что variant сейчас хранит double,
-        // можно смело брать это значение при помощи std::get.
         return get<int>(value_);
-    } else {
-        throw std::logic_error("holds_alternative<std::string>(value_)");
     }
+    throw std::logic_error("holds_alternative<std::string>(value_)");
 }
 
 bool Node::AsBool() const {
     if (holds_alternative<bool>(value_)) {
-        // Когда мы убедились, что variant сейчас хранит double,
-        // можно смело брать это значение при помощи std::get.
         return get<bool>(value_);
-    } else {
-        throw std::logic_error("holds_alternative<std::string>(value_)");
     }
+    throw std::logic_error("holds_alternative<std::string>(value_)");
 }
 
 double Node::AsDouble() const
 {
     if (holds_alternative<double>(value_) || holds_alternative<int>(value_)) {
-        // Когда мы убедились, что variant сейчас хранит double,
-        // можно смело брать это значение при помощи std::get.
         try {
             return get<double>(value_);
         } catch (const bad_variant_access& e) {
             return double(get<int>(value_));
         }
-    } else {
-        throw std::logic_error("holds_alternative<std::string>(value_)");
     }
+    throw std::logic_error("holds_alternative<std::string>(value_)");
 }
 
 const string& Node::AsString() const {
     if (holds_alternative<std::string>(value_)) {
-        // Когда мы убедились, что variant сейчас хранит double,
-        // можно смело брать это значение при помощи std::get.
         return get<std::string>(value_);
-    } else {
-        throw std::logic_error("holds_alternative<std::string>(value_)");
     }
+    throw std::logic_error("holds_alternative<std::string>(value_)");
 }
 
 Document::Document(Node root)

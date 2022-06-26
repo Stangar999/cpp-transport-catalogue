@@ -53,7 +53,11 @@ public:
 //        return buses_;
 //    };
 
+    std::vector<const domain::Bus*> GetBusesLex() const ;
+
     std::size_t GetRangeStops(const Stop* from_stop, const Stop* to_stop) const ;
+
+    domain::BusStat GetBusStat(const Bus* bus) const;
 
     std::optional<const Bus*> FindBus(std::string_view bus_name) const ;
 

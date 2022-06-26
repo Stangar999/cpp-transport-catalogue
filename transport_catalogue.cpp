@@ -34,6 +34,16 @@ void TransportCatalogue::AddBusesFromStop(const Bus& bus) {
     }
 }
 //----------------------------------------------------------------------------
+std::vector<const Bus*> TransportCatalogue::GetBusesLex() const
+{
+    // использую сет как фильтр уникальных и сортировщик, кладу в вектор так как потом надо будет только итерироваться
+    std::set<const domain::Bus*, domain::CmpBuses> set;
+    for(const auto& bus : buses_){
+        set.insert(&bus);
+    }
+    return {set.begin(), set.end()};
+}
+//----------------------------------------------------------------------------
 size_t TransportCatalogue::GetRangeStops(const Stop* from_stop, const Stop* to_stop) const {
     size_t result = 0;
     if(index_rage_.count(pair(from_stop, to_stop)) != 0 ){
@@ -42,6 +52,24 @@ size_t TransportCatalogue::GetRangeStops(const Stop* from_stop, const Stop* to_s
         result = index_rage_.at(pair(to_stop, from_stop));
     }
     return result;
+}
+//----------------------------------------------------------------------------
+BusStat TransportCatalogue::GetBusStat(const Bus* bus) const
+{
+    size_t coutn_stops = bus->stops.size();
+    if(coutn_stops < 2){
+        throw "coutn_stops < 2";
+    }
+    size_t length = 0;
+    double range = 0;
+    std::set<const domain::Stop*> stops(bus->stops.begin(), bus->stops.end());
+    for(size_t i = 0, j = 1; j < coutn_stops; ++i, ++j){
+        const domain::Stop* from_stop  = bus->stops[i];
+        const domain::Stop* to_stop = bus->stops[j];
+        length += GetRangeStops(from_stop, to_stop);
+        range += domain::ComputeDistance( from_stop, to_stop );
+    }
+    return {bus->name, coutn_stops, stops.size(), length, length / range};
 }
 //----------------------------------------------------------------------------
 void TransportCatalogue::AddBus(const Bus& bus) {

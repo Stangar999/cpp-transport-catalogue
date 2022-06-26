@@ -1,8 +1,7 @@
 ﻿#include "domain.h"
-#include "geo.h"
 
-
-double domain::ComputeDistance(double from_lat, double from_lng, double to_lat, double to_lng)
+double domain::ComputeDistance(const Stop* from_stop, const Stop* to_stop)
 {
-    return geo::ComputeDistance( {from_lat, from_lng}, {to_lat, to_lng} );
+    return geo::ComputeDistance( from_stop->coord, to_stop->coord );
 }
+

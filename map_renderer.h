@@ -105,53 +105,32 @@ namespace RenderSettingsKey {
     const std::string color_palette = "color_palette"s;
 }
 
-//struct RenderSettings {
-//    double width = 600.0;
-//    double height = 400.0;
-
-//    double padding = 50.0;
-
-//    double line_width = 14.0;
-//    double stop_radius = 5.0;
-
-//    int bus_label_font_size = 20;
-//    std::pair<double, double> bus_label_offset = {7.0, 15.0};
-
-//    int stop_label_font_size = 20;
-//    std::pair<double, double> stop_label_offset = {7.0, -3.0};
-
-//    svg::Color underlayer_color = svg::Rgba{255, 255, 255, 0.85};
-
-//    double underlayer_width = 3.0;
-
-//    std::vector<svg::Color> color_palette = {
-//      {"green"},
-//      svg::Rgb{255, 160, 0},
-//      {"red"}
-//    };
-//};
-
 struct RenderSettings {
-    double width ;
-    double height ;
+    double width = 600.0;
+    double height = 400.0;
 
-    double padding ;
+    double padding = 50.0;
 
-    double line_width ;
-    double stop_radius ;
+    double line_width = 14.0;
+    double stop_radius = 5.0;
 
-    int bus_label_font_size ;
-    svg::Point bus_label_offset ;
+    int bus_label_font_size = 20;
+    svg::Point bus_label_offset = {7.0, 15.0};
 
-    int stop_label_font_size ;
-    svg::Point stop_label_offset ;
+    int stop_label_font_size = 20;
+    svg::Point stop_label_offset = {7.0, -3.0};
 
-    svg::Color underlayer_color ;
+    svg::Color underlayer_color = svg::Rgba{255, 255, 255, 0.85};
 
-    double underlayer_width ;
+    double underlayer_width = 3.0;
 
-    std::vector<svg::Color> color_palette;
+    std::vector<svg::Color> color_palette = {
+      {"green"},
+      svg::Rgb{255, 160, 0},
+      {"red"}
+    };
 };
+
 
 class MapRenderer{
 using busesstopes = const std::map<std::string_view, const std::vector<const domain::Stop*>*>;
@@ -161,7 +140,6 @@ public:
 
     void SetRenderSettings(RenderSettings&& render_settings);
 
-//    void SetBusesStops(busesstopes& buses_stopes);
     void SetBuses(std::vector<const domain::Bus*>&& buses);
 
     // Устанавливае перечень уникальных остановок в лекс поряд используемых в маршрутах
@@ -190,8 +168,6 @@ private:
     std::vector<const domain::Stop*> stopes_;
     //перечень маршрутов в лекс поряд
     std::vector<const domain::Bus*> buses_;
-
-    //busesstopes* buses_stopes_ = nullptr;
 };
 
 }// namespace MapRenderer

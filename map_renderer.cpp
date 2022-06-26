@@ -24,7 +24,7 @@ SphereProjector MapRenderer::CreateProj() {
     std::vector<geo::Coordinates> vec_common_coord;
     vec_common_coord.reserve(stopes_.size());
     for(const auto& stop : stopes_){
-        vec_common_coord.push_back({stop->lat, stop->lng});
+        vec_common_coord.push_back(stop->coord);
     }
     // Создаём проектор сферических координат на карту
     return SphereProjector{ vec_common_coord.begin(), vec_common_coord.end(),
@@ -49,7 +49,7 @@ void MapRenderer::DrawLineBuses(svg::Document& doc, const SphereProjector& proj)
         polyl.SetStrokeLineJoin(svg::StrokeLineJoin::ROUND);
 
         for(const auto& stop : bus->stops){
-            polyl.AddPoint(proj({stop->lat, stop->lng}));
+            polyl.AddPoint(proj(stop->coord));
         }
         doc.Add(polyl);
     }
@@ -68,13 +68,13 @@ void MapRenderer::DrawNameBuses(svg::Document& doc, const SphereProjector& proj)
         if ( ++counter_color >= render_settings_.color_palette.size()) {
             counter_color = 0;
         }
-        DrawNameBus(doc, proj, {stop->lat, stop->lng}, fill_color, bus->name);
+        DrawNameBus(doc, proj, stop->coord, fill_color, bus->name);
         if(!bus->is_round ){
             size_t id = std::ceil(bus->stops.size() / 2); // ATTENTION
             // если остановки начала и конца не равны подписываем остановку конца
             if(stop != bus->stops[id]){
                 stop = bus->stops[id];
-                DrawNameBus(doc, proj, {stop->lat, stop->lng}, fill_color, bus->name);
+                DrawNameBus(doc, proj, stop->coord, fill_color, bus->name);
             }
         }
     }
@@ -84,7 +84,7 @@ void MapRenderer::DrawCircStopes(svg::Document& doc, const SphereProjector& proj
 {
     for(const auto& stop : stopes_){
         svg::Circle circle;
-        circle.SetCenter(proj({stop->lat, stop->lng}));
+        circle.SetCenter(proj(stop->coord));
         circle.SetRadius(render_settings_.stop_radius);
         circle.SetFillColor("white"s);
         doc.Add(circle);
@@ -95,7 +95,7 @@ void MapRenderer::DrawNameStopes(svg::Document& doc, const SphereProjector& proj
 {
     for(const auto& stop : stopes_){
         svg::Text note_stop;
-        note_stop.SetPosition(proj({stop->lat, stop->lng}));
+        note_stop.SetPosition(proj(stop->coord));
         note_stop.SetOffset(render_settings_.stop_label_offset);
         note_stop.SetFontSize(render_settings_.stop_label_font_size);
         note_stop.SetFontFamily("Verdana"s);

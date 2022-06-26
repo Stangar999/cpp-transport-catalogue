@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "geo.h"
 #include <set>
 #include <string>
 #include <vector>
@@ -50,8 +51,6 @@ struct BusStat{
     double curvature = 0;
 };
 
-double ComputeDistance(double from_lat, double from_lng, double to_lat, double to_lng);
-
 struct StopInfo{
     const std::string& name;
     bool b_stop_is_not_exist = false;
@@ -60,8 +59,7 @@ struct StopInfo{
 
 struct Stop{
     std::string name;
-    double lat;
-    double lng;
+    geo::Coordinates coord;
 };
 
 struct CmpStops{
@@ -87,5 +85,7 @@ struct StopsLenght{
     std::string to_stop;
     size_t lenght;
 };
+
+double ComputeDistance(const Stop* from_stop, const Stop* to_stop);
 
 }//namespace domain
