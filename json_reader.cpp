@@ -1,14 +1,8 @@
 ﻿#include <algorithm>
 #include <ostream>
 #include <sstream>
-
 #include "json_reader.h"
 
-
-/*
- * Здесь можно разместить код наполнения транспортного справочника данными из JSON,
- * а также код обработки запросов к базе и формирование массива ответов в формате JSON
- */
 namespace JsonReader
 {
 //----------------------------------------------------------------------------
@@ -22,14 +16,14 @@ JsonReader::JsonReader(std::istream &in,
 {
     using namespace domain;
 
-    auto main_map = std::move(json::Load(in).GetRoot().AsMap());
+    auto main_map = std::move(json::Load(in).GetRoot().AsDict());
 
     if(auto it = main_map.find(MainReq::base); it != main_map.end()){
         auto vec_map = std::move(it->second.AsArray());
         ParseRequestsBase(std::move(vec_map));
     }
     if(auto it = main_map.find(MainReq::render_settings); it != main_map.end()){
-        auto map = std::move(it->second.AsMap());
+        auto map = std::move(it->second.AsDict());
         ParseRequestsRendSett(std::move(map));
     }
     if(auto it = main_map.find(MainReq::stat); it != main_map.end()){
@@ -43,20 +37,20 @@ void JsonReader::ParseRequestsBase(json::Array&& vec_map)
     using namespace domain;
 
     auto compare = [](const auto& lh, const auto& rh){
-        return lh.AsMap().at(MainReq::type).AsString() > rh.AsMap().at(MainReq::type).AsString();
+        return lh.AsDict().at(MainReq::type).AsString() > rh.AsDict().at(MainReq::type).AsString();
     };
     std::sort(vec_map.begin(), vec_map.end(), compare);
 
     for(const auto& map_type_data : vec_map){
-        if(const auto& map_type_stop = map_type_data.AsMap(); map_type_stop.at(MainReq::type).AsString() == MainReq::stop){
+        if(const auto& map_type_stop = map_type_data.AsDict(); map_type_stop.at(MainReq::type).AsString() == MainReq::stop){
             db_.AddStop(ParseRequestsStops(map_type_stop));
         } else {
-            auto bus =  ParseRequestsBuses(map_type_data.AsMap());
+            auto bus =  ParseRequestsBuses(map_type_data.AsDict());
             db_.AddBus(bus);
         }
     }
     for (const auto& map_type_data : vec_map){
-        if (const auto& map_type_stop = map_type_data.AsMap(); map_type_stop.at(MainReq::type).AsString() == MainReq::stop){
+        if (const auto& map_type_stop = map_type_data.AsDict(); map_type_stop.at(MainReq::type).AsString() == MainReq::stop){
             ParseRequestsStopsLenght(move(map_type_stop));
         }
     }
@@ -70,7 +64,7 @@ void JsonReader::ParseRequestsStat(const json::Array& vec_map)
     RequestOut result;
     requests.reserve(vec_map.size());
     for(const auto& req : vec_map){
-        const auto cur_req = req.AsMap();
+        const auto cur_req = req.AsDict();
         requests.push_back( { std::move(cur_req.at(MainReq::id).AsInt()), std::move(cur_req.at(MainReq::type).AsString()),
                               cur_req.count(MainReq::name) != 0 ? std::move(cur_req.at(MainReq::name).AsString()) : "" } );
     }
@@ -221,7 +215,7 @@ void JsonReader::ParseRequestsStopsLenght(const json::Dict& req)
     const std::string& name_from_stop = req.at(MainReq::name).AsString();
     std::string range;
     try{
-        for(const auto& rd : req.at(MainReq::road_distances).AsMap()){
+        for(const auto& rd : req.at(MainReq::road_distances).AsDict()){
             db_.AddRangeStops( {std::move(name_from_stop), rd.first, static_cast<size_t>(rd.second.AsInt())} );
         }
     } catch(...) {
@@ -234,14 +228,16 @@ json::Dict JsonReader::PrintResReqBus(std::optional<domain::BusStat>&& bus_stat_
 {
     if(bus_stat_opt){
         const auto &[name, count_stops, count_unic_stops, lengh, curvature] = *bus_stat_opt;
-        return json::Dict{{"curvature"s, curvature},
-                       {"request_id"s, id },
-                       {"route_length"s, static_cast<double>(lengh) },
-                       {"stop_count"s, static_cast<double>(count_stops) },
-                       {"unique_stop_count"s, static_cast<double>(count_unic_stops) } };
+        return json::Builder{}.StartDict().Key("curvature"s).Value(curvature)
+                                          .Key("request_id"s).Value(id)
+                                          .Key("route_length"s).Value(static_cast<double>(lengh))
+                                          .Key("stop_count"s).Value(static_cast<double>(count_stops))
+                                          .Key("unique_stop_count"s).Value(static_cast<double>(count_unic_stops))
+                                          .EndDict().Build().AsDict();
     } else {
-        return json::Dict{{"request_id"s, id },
-                       {"error_message"s, "not found" } };
+        return json::Builder{}.StartDict().Key("request_id"s).Value(id)
+                                          .Key("error_message"s).Value("not found"s)
+                                          .EndDict().Build().AsDict();
     }
 }
 //----------------------------------------------------------------------------
@@ -259,11 +255,13 @@ json::Dict JsonReader::PrintResReqStop(std::optional< const std::unordered_set<c
         for(const auto& bus : buss){
             vec.push_back(std::string(bus));
         }
-        return json::Dict{{"buses"s, vec},
-                       {"request_id"s, id } };
+        return json::Builder{}.StartDict().Key("buses"s).Value(vec)
+                                          .Key("request_id"s).Value(id)
+                                          .EndDict().Build().AsDict();
     } else {
-        return json::Dict{{"request_id"s, id },
-                       {"error_message"s, "not found" } };
+        return json::Builder{}.StartDict().Key("request_id"s).Value(id)
+                                          .Key("error_message"s).Value("not found"s)
+                                          .EndDict().Build().AsDict();
     }
 }
 //----------------------------------------------------------------------------
@@ -275,7 +273,9 @@ json::Dict JsonReader::PrintResReqMap(std::optional<svg::Document>&& doc_opt, in
     const auto& doc = doc_opt.value();
     std::ostringstream str;
     doc.Render(str);
-    return json::Dict{{"map"s, str.str()}, {"request_id"s, id } };
+    return json::Builder{}.StartDict().Key("map"s).Value(str.str())
+                                      .Key("request_id"s).Value(id)
+                                      .EndDict().Build().AsDict();
 }
 //----------------------------------------------------------------------------
 }// namespace JsonReader
