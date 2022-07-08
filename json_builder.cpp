@@ -9,123 +9,95 @@ namespace json {
 Builder::Builder() {
 }
 
-Builder& Builder::Value(Node::Value value) {
+DictItemContext& Builder::StartDict() {
     IsReady();
     ExpectKey();
-    nodes_stack_.emplace_back(new Node(std::move(value)));
-    KeyComplite();
-    return *this;
+    init = true;
+    if(nodes_stack_.back()->IsArray()) {
+        auto* ptr = &std::get<Array>(nodes_stack_.back()->GetValue()).emplace_back(Dict{});
+        nodes_stack_.emplace_back(ptr);
+    } else {
+        nodes_stack_.back()->GetValue() = Dict{};
+        auto* ptr = nodes_stack_.back();
+        if( expect_value ) {
+            nodes_stack_.pop_back();
+            expect_value = false;
+        }
+        nodes_stack_.emplace_back(ptr);
+    }
+    return static_cast<DictItemContext&>(*this);
 }
 
-DictItemContext Builder::StartDict() {
+KeyItemContext& Builder::Key(std::string key) {
     IsReady();
-    ExpectKey();
-    nodes_stack_.emplace_back(new Node(Dict{}));
-    stck_lst_call_Dict.push(nodes_stack_.size() - 1 );
-    KeyComplite();
-    stack_cmds.push(CMDS::DICT);
-    return DictItemContext{*this};
-}
-
-KeyItemContext Builder::Key(std::string key) {
-    IsReady();
-    ExpectValue();
-    nodes_stack_.emplace_back(new Node(std::move(key)));
-    stack_cmds.push(CMDS::KEY);
-    return KeyItemContext{*this};
+    if(nodes_stack_.back()->IsDict()) {
+        auto* ptr = &std::get<Dict>(nodes_stack_.back()->GetValue())[key];
+        expect_value = true;
+        nodes_stack_.emplace_back(ptr);
+    } else {
+        throw std::logic_error("Неверная команда");
+    }
+    return static_cast<KeyItemContext&>(*this);
 }
 
 Builder& Builder::EndDict() {
     IsReady();
-    ExpectValue();
-    stack_cmds.pop();
-    auto it = nodes_stack_.begin() + stck_lst_call_Dict.top();
-    if((*it)->IsDict()){
-        Dict cont {};
-        for( auto it_d = (it + 1) ; it_d != nodes_stack_.end(); ++it_d ) {
-            std::string key = std::move((*it_d)->AsString());
-            cont[key] = std::move((*(++it_d))->GetValue());
-        }
-        (*it)->GetValue() = std::move(cont);
-        nodes_stack_.erase((it + 1), nodes_stack_.end());
-        stck_lst_call_Dict.pop();
+    if(nodes_stack_.back()->IsDict()) {
+        nodes_stack_.pop_back();
+    } else {
+        throw std::logic_error("Неверная команда");
     }
     return *this;
 }
 
-ArrayItemContext Builder::StartArray() {
+ArrayItemContext& Builder::StartArray() {
     IsReady();
     ExpectKey();
-    nodes_stack_.emplace_back(new Node(Array{}));
-    stck_lst_call_Arr.push(nodes_stack_.size() - 1 );
-    KeyComplite();
-    stack_cmds.push(CMDS::ARR);
-    return ArrayItemContext{*this};
+    init = true;
+    if(nodes_stack_.back()->IsArray()) {
+        auto* ptr = &std::get<Array>(nodes_stack_.back()->GetValue()).emplace_back(Array{});
+        nodes_stack_.emplace_back(ptr);
+    } else {
+        nodes_stack_.back()->GetValue() = Array{};
+        auto* ptr = nodes_stack_.back();
+        if( expect_value ) {
+            nodes_stack_.pop_back();
+            expect_value = false;
+        }
+        nodes_stack_.emplace_back(ptr);
+    }
+    return static_cast<ArrayItemContext&>(*this);
 }
 
 Builder& Builder::EndArray() {
     IsReady();
-    if ( ! stack_cmds.empty() && stack_cmds.top() != CMDS::ARR) {
-        throw std::logic_error("Вызов EndArray в неверном месте");
-    }
-    stack_cmds.pop();
-    auto it = nodes_stack_.begin() + stck_lst_call_Arr.top();
-    if((*it)->IsArray()){
-        stck_lst_call_Arr.pop();
-        Array cont {};
-        for( auto it_d = (it+1); it_d != nodes_stack_.end(); ++it_d ) {
-            cont.emplace_back(std::move((*it_d)->GetValue()));
-        }
-        (*it)->GetValue() = std::move(cont);
-        nodes_stack_.erase((it+1), nodes_stack_.end());
+    if(nodes_stack_.back()->IsArray()) {
+        nodes_stack_.pop_back();
+    } else {
+        throw std::logic_error("Неверная команда");
     }
     return *this;
 }
 
 Node Builder::Build() {
-    if( ! stack_cmds.empty() ) {
-        throw std::logic_error("Вызов метода Build при неготовом описываемом объекте");
-    }
-    if(nodes_stack_.size() != 1) {
-        throw std::logic_error("Вызов метода Build сразу после конструктора");
-    }
-    if( ! nodes_stack_.empty()) {
-        root_ = std::move(*nodes_stack_.back());
+    if(nodes_stack_.size() != 1 || ! init) {
+        throw std::logic_error("Неверная команда");
     }
     return root_;
 }
 
 void Builder::IsReady()
 {
-    if(nodes_stack_.size() == 1 && stack_cmds.empty()) {
-        throw std::logic_error("Вызов при готовом объекте");
+    if(nodes_stack_.size() == 1 && init) {
+        throw std::logic_error("Неверная команда");
     }
 }
 
 void Builder::ExpectKey()
 {
-    if ( ! stack_cmds.empty() && stack_cmds.top() == CMDS::DICT) {
-        throw std::logic_error("Ожидался вызов key или EndDict");
+    if(nodes_stack_.back()->IsDict()) {
+        throw std::logic_error("Неверная команда");
     }
-}
-
-void Builder::KeyComplite()
-{
-    if ( ! stack_cmds.empty() && stack_cmds.top() == CMDS::KEY) {
-        stack_cmds.pop();
-    }
-}
-
-void Builder::ExpectValue()
-{
-    if ( ! stack_cmds.empty() && stack_cmds.top() != CMDS::DICT) {
-        throw std::logic_error("Вызов EndDict в неверном месте или "
-                               "Вызов key вне словаря или после Key");
-    }
-}
-
-KeyItemContext DictItemContext::Key(std::string key){
-    return builder_.Key(std::move(key));
 }
 
 }

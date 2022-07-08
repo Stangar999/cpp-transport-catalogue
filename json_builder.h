@@ -8,89 +8,76 @@ namespace json {
 class ArrayItemContext;
 class KeyItemContext;
 class DictItemContext;
-class Builder;
-
 
 class Builder
 {
-    enum class CMDS {
-        ARR,
-        DICT,
-        KEY
-    };
 
 public:
     Builder();
-    template<typename T>
-    T Value(Node::Value value);
-    Builder& Value(Node::Value value);
-    DictItemContext StartDict();
+    template<typename T = Builder>
+    T& Value(Node::Value value);
+    DictItemContext& StartDict();
     Builder& EndDict();
-    ArrayItemContext StartArray();
+    ArrayItemContext& StartArray();
     Builder& EndArray();
     json::Node Build();
-    KeyItemContext Key(std::string key);
+    KeyItemContext& Key(std::string key);
 
 private:
     Node root_;
-    std::vector<Node*> nodes_stack_;
-    std::stack<CMDS> stack_cmds;
-    std::stack<size_t> stck_lst_call_Arr;
-    std::stack<size_t> stck_lst_call_Dict;
-
+    bool expect_value =false;
+    bool init =false;
+    std::vector<Node*> nodes_stack_{&root_};
     void IsReady();
     void ExpectKey();
-    void KeyComplite();
-    void ExpectValue();
 };
 
 template<typename T>
-T Builder::Value(Node::Value value) {
+T& Builder::Value(Node::Value value) {
     IsReady();
     ExpectKey();
-    nodes_stack_.emplace_back(new Node(std::move(value)));
-    KeyComplite();
-    return T{*this};
+    init = true;
+    if(nodes_stack_.back()->IsArray()) {
+        std::get<Array>(nodes_stack_.back()->GetValue()).emplace_back(value);
+    } else {
+        nodes_stack_.back()->GetValue() = value;
+    }
+    if( expect_value ) {
+        nodes_stack_.pop_back();
+        expect_value = false;
+    }
+    return static_cast<T&>(*this);;
 }
 
-class DictItemContext {
+class DictItemContext: public Builder {
 public:
-    Builder& builder_;
-    Builder& EndDict(){
-        return builder_.EndDict();
-    };
-    KeyItemContext Key(std::string key);
+    template<typename T>
+    T Value(Node::Value value) = delete;
+    Builder& Value(Node::Value value) = delete;
+    DictItemContext& StartDict() = delete;
+    ArrayItemContext& StartArray() = delete;
+    Builder& EndArray() = delete;
+    json::Node Build() = delete;
 };
 
-class ArrayItemContext {
+class ArrayItemContext: public Builder {
 public:
-    Builder& builder_;
-    ArrayItemContext StartArray() {
-        return builder_.StartArray();
+    Builder& EndDict() = delete;
+    json::Node Build() = delete;
+    KeyItemContext& Key(std::string key) = delete;
+    ArrayItemContext& Value(Node::Value value) {
+        return Builder::Value<ArrayItemContext>(std::move(value));
     }
-    DictItemContext StartDict() {
-        return builder_.StartDict();
-    }
-    ArrayItemContext Value(Node::Value value) {
-        return builder_.Value<ArrayItemContext>(std::move(value));
-    }
-    Builder& EndArray(){
-        return builder_.EndArray();
-    };
 };
 
-class KeyItemContext {
+class KeyItemContext: public Builder {
 public:
-    Builder& builder_;
-
-    DictItemContext StartDict() {
-        return builder_.StartDict();
-    }
-    ArrayItemContext StartArray() {
-        return builder_.StartArray();
-    }
-    DictItemContext Value(Node::Value value) {
-        return builder_.Value<DictItemContext>(std::move(value));
+    Builder& EndDict() = delete;
+    Builder& EndArray() = delete;
+    json::Node Build() = delete;
+    KeyItemContext& Key(std::string key) = delete;
+    DictItemContext& Value(Node::Value value) {
+        return Builder::Value<DictItemContext>(std::move(value));
     }
 };
 
