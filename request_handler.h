@@ -4,6 +4,7 @@
 #include "transport_catalogue.h"
 #include "domain.h"
 #include "map_renderer.h"
+#include "transport_router.h"
 
 /*
  * Здесь можно было бы разместить код обработчика запросов к базе, содержащего логику, которую не
@@ -25,10 +26,15 @@ class RequestHandler {
 
 public:
     // MapRenderer понадобится в следующей части итогового проекта
-    RequestHandler(const TransportCatalogue::TransportCatalogue& db, renderer::MapRenderer& renderer);
+    RequestHandler(const TransportCatalogue::TransportCatalogue& db,
+                   TransportRouter::TransportRouter& tr,
+                   renderer::MapRenderer& renderer);
 
     // Возвращает информацию о маршруте (запрос Bus)
     std::optional<domain::BusStat> GetBusStat(const std::string_view& bus_name) const;
+
+    // Возвращает информацию о маршруте (запрос Route)
+    std::optional<domain::RoutStat> GetRouteStat(std::string_view stop_from, std::string_view stop_to) const;
 
     // Возвращает маршруты, проходящие через
     std::optional<const std::unordered_set<const domain::Bus*>*> GetBusesByStop(const std::string_view& stop_name) const;
@@ -47,6 +53,8 @@ private:
     domain::BusStat CreateBusStat (const domain::Bus* bus) const;
 
     const TransportCatalogue::TransportCatalogue& db_;
+
+    TransportRouter::TransportRouter& tr_;
 
     renderer::MapRenderer& renderer_;
 };

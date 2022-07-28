@@ -4,6 +4,7 @@
 //#include "json.h"
 #include "json_builder.h"
 #include "transport_catalogue.h"
+#include "transport_router.h"
 #include "request_handler.h"
 #include "map_renderer.h"
 
@@ -19,6 +20,7 @@ class JsonReader
 {
 public:
     JsonReader(std::istream& in, TransportCatalogue::TransportCatalogue& db,
+               TransportRouter::TransportRouter& tr,
                const RequestHandler& req_hand,
                renderer::MapRenderer& renderer);
 private:
@@ -36,13 +38,19 @@ private:
 
     void ParseRequestsRendSett(const json::Dict&& map);
 
+    void ParseRequestsRoutSett(const json::Dict&& req);
+
     json::Dict PrintResReqBus(std::optional<domain::BusStat>&& bus_stat_opt, int id);
 
     json::Dict PrintResReqStop(std::optional<const std::unordered_set<const domain::Bus*>*> buses_opt, int id);
 
     json::Dict PrintResReqMap(std::optional<svg::Document>&& doc_opt, int id);
 
+    json::Dict PrintResReqRoute(std::optional<domain::RoutStat>&& rout_stat_opt, int id);
+
     TransportCatalogue::TransportCatalogue& db_;
+
+    TransportRouter::TransportRouter& tr_;
 
     const RequestHandler& req_hand_;
 

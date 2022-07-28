@@ -3,6 +3,7 @@
 #include "geo.h"
 #include <set>
 #include <string>
+#include <variant>
 #include <vector>
 
 namespace domain
@@ -13,14 +14,21 @@ using namespace std::literals;
     const std::string base = "base_requests"s;
     const std::string stat = "stat_requests"s;
     const std::string render_settings = "render_settings"s;
+    const std::string routing_settings = "routing_settings"s;
+      const std::string bus_velocity = "bus_velocity"s;
+      const std::string bus_wait_time = "bus_wait_time"s;
 
     const std::string type = "type"s;
+      const std::string bus = "Bus"s;
+      const std::string stop = "Stop"s;
+      const std::string route = "Route"s;
+        const std::string from = "from"s;
+        const std::string to = "to"s;
 
-    const std::string bus = "Bus"s;
     const std::string stops = "stops"s;
     const std::string is_roundtrip = "is_roundtrip"s;
 
-    const std::string stop = "Stop"s;
+
     const std::string name = "name"s;
     const std::string lat = "latitude"s;
     const std::string lon = "longitude"s;
@@ -41,6 +49,7 @@ struct RequestOut{
     int id;
     std::string type;
     std::string name;
+    std::optional<std::string> name_to;
 };
 
 struct BusStat{
@@ -60,6 +69,7 @@ struct StopInfo{
 struct Stop{
     std::string name;
     geo::Coordinates coord;
+    size_t id;
 };
 
 struct CmpStops{
@@ -86,6 +96,60 @@ struct StopsLenght{
     size_t lenght;
 };
 
+struct RoutingSettings{
+    int bus_wait_time_minut = 0; // minute
+    double bus_velocity = 0; // km/h
+};
+
+struct RoutStat{
+
+//    struct Items{
+//        //Items() = default;
+//        virtual ~Items(){};
+//        std::string type;
+//        double time = 0;
+//    };
+
+//    struct ItemsWait: public Items {
+//        //ItemsWait() = default;
+//        //std::string type;
+//        //double time = 0;
+//        std::string stop_name;
+//    };
+
+//    struct ItemsBus: public Items {
+//        //std::string type;
+//        //double time = 0;
+//        ItemsBus() {};
+//        size_t span_count = 0;
+//        std::string bus;
+//    };
+// dynamic_cast<RoutStat::ItemsWait*>(item);
+
+
+    struct ItemsWait {
+        std::string type;
+        double time = 0;
+        std::string stop_name;
+    };
+
+    struct ItemsBus {
+        std::string type;
+        double time = 0;
+        size_t span_count = 0;
+        std::string bus;
+    };
+
+    using VariantItem = std::variant<ItemsBus, ItemsWait>;
+
+    double total_time = 0; // minute
+    std::vector<VariantItem> items;
+
+    //std::vector<Items*> items;
+};
+
 double ComputeDistance(const Stop* from_stop, const Stop* to_stop);
+
+double GetMetrMinFromKmH(double km_h);
 
 }//namespace domain

@@ -1,8 +1,11 @@
 ﻿#include "request_handler.h"
 
 //----------------------------------------------------------------------------
-RequestHandler::RequestHandler(const TransportCatalogue::TransportCatalogue& db, renderer::MapRenderer& renderer)
+RequestHandler::RequestHandler(const TransportCatalogue::TransportCatalogue& db,
+                               TransportRouter::TransportRouter& tr,
+                               renderer::MapRenderer& renderer)
     :db_(db)
+    ,tr_(tr)
     ,renderer_(renderer)
 {
 
@@ -15,6 +18,14 @@ std::optional<domain::BusStat> RequestHandler::GetBusStat(const std::string_view
     } else {
         return std::nullopt;
     }
+}
+//----------------------------------------------------------------------------
+std::optional<domain::RoutStat> RequestHandler::GetRouteStat(std::string_view stop_from, std::string_view stop_to) const
+{
+    if(tr_.GetGraphIsNoInit()) {
+        tr_.CreateGraph(db_);
+    }
+    return tr_.GetRoutStat(db_.FindStop(stop_from).value()->id, db_.FindStop(stop_to).value()->id);
 }
 //----------------------------------------------------------------------------
 std::optional< const std::unordered_set<const domain::Bus*>* > RequestHandler::GetBusesByStop(const std::string_view& stop_name) const

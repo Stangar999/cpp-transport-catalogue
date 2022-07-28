@@ -90,6 +90,8 @@ private:
     std::unordered_map<std::string_view, const Bus*> index_buses_;
 
     std::unordered_map<std::pair<const Stop*, const Stop*>, size_t, detail::HasherStopes> index_rage_;
+
+    size_t counter_stop_ = 0;
 };
 
 }// namespace TransportCatalogue

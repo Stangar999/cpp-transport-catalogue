@@ -3,6 +3,7 @@
 #include "json_reader.h"
 #include "map_renderer.h"
 #include "request_handler.h"
+#include "transport_router.h"
 //#include "tests.h"
 
 using namespace std;
@@ -24,8 +25,10 @@ int main() {
     // Все это запутанно получается и как то странно
     // у меня правльно организован порядок вызова и места вызовов начала расчета, печати и тд?
     TransportCatalogue::TransportCatalogue db;
+    TransportRouter::TransportRouter tr;
     renderer::MapRenderer rend;
-    RequestHandler req_hand(db, rend);
-    JsonReader::JsonReader j_r(cin, db, req_hand, rend);
+    RequestHandler req_hand(db, tr, rend);
+    JsonReader::JsonReader j_r(cin, db, tr, req_hand, rend);
+    //cout << endl << "ok" << endl;
 }
 

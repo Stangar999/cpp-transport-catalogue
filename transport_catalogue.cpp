@@ -15,6 +15,7 @@ TransportCatalogue::TransportCatalogue()
 //----------------------------------------------------------------------------
 void TransportCatalogue::AddStop(const Stop& stop) {
     stops_.push_back(move(stop));
+    stops_.back().id = counter_stop_++;
     index_stops_[stops_.back().name] = &stops_.back();
 }
 //----------------------------------------------------------------------------
@@ -56,20 +57,20 @@ size_t TransportCatalogue::GetRangeStops(const Stop* from_stop, const Stop* to_s
 //----------------------------------------------------------------------------
 BusStat TransportCatalogue::GetBusStat(const Bus* bus) const
 {
-    size_t coutn_stops = bus->stops.size();
-    if(coutn_stops < 2){
+    size_t count_stops = bus->stops.size();
+    if(count_stops < 2){
         throw "coutn_stops < 2";
     }
     size_t length = 0;
     double range = 0;
     std::set<const domain::Stop*> stops(bus->stops.begin(), bus->stops.end());
-    for(size_t i = 0, j = 1; j < coutn_stops; ++i, ++j){
+    for(size_t i = 0, j = 1; j < count_stops; ++i, ++j){
         const domain::Stop* from_stop  = bus->stops[i];
         const domain::Stop* to_stop = bus->stops[j];
         length += GetRangeStops(from_stop, to_stop);
         range += domain::ComputeDistance( from_stop, to_stop );
     }
-    return {bus->name, coutn_stops, stops.size(), length, length / range};
+    return {bus->name, count_stops, stops.size(), length, length / range};
 }
 //----------------------------------------------------------------------------
 void TransportCatalogue::AddBus(const Bus& bus) {
@@ -92,13 +93,11 @@ std::optional<const Stop*> TransportCatalogue::FindStop(std::string_view stop_na
     return index_stops_.at(stop_name);
 }
 //----------------------------------------------------------------------------
-const std::map<std::string_view, std::unordered_set<const Bus*>>& TransportCatalogue::GetBusesFromStop() const
-{
+const std::map<std::string_view, std::unordered_set<const Bus*>>& TransportCatalogue::GetBusesFromStop() const {
     return buses_from_stop_;
 }
 //----------------------------------------------------------------------------
-const std::deque<Bus>& TransportCatalogue::GetBuses() const
-{
+const std::deque<Bus>& TransportCatalogue::GetBuses() const {
     return buses_;
 }
 //----------------------------------------------------------------------------

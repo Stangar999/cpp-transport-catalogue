@@ -8,9 +8,11 @@ namespace JsonReader
 //----------------------------------------------------------------------------
 JsonReader::JsonReader(std::istream &in,
                        TransportCatalogue::TransportCatalogue& db,
+                       TransportRouter::TransportRouter& tr,
                        const RequestHandler& req_hand,
                        renderer::MapRenderer& renderer)
     :db_(db)
+    ,tr_(tr)
     ,req_hand_(req_hand)
     ,renderer_(renderer)
 {
@@ -26,10 +28,15 @@ JsonReader::JsonReader(std::istream &in,
         auto map = std::move(it->second.AsDict());
         ParseRequestsRendSett(std::move(map));
     }
+    if(auto it = main_map.find(MainReq::routing_settings); it != main_map.end()){
+        auto map = std::move(it->second.AsDict());
+        ParseRequestsRoutSett(std::move(map));
+    }
     if(auto it = main_map.find(MainReq::stat); it != main_map.end()){
         auto vec_map = std::move(it->second.AsArray());
         ParseRequestsStat(vec_map);
     }
+
 }
 //----------------------------------------------------------------------------
 void JsonReader::ParseRequestsBase(json::Array&& vec_map)
@@ -41,14 +48,22 @@ void JsonReader::ParseRequestsBase(json::Array&& vec_map)
     };
     std::sort(vec_map.begin(), vec_map.end(), compare);
 
+//    // маршрутизатор не инициализирован
+//    bool is_init_transport_router = false;
     for(const auto& map_type_data : vec_map){
         if(const auto& map_type_stop = map_type_data.AsDict(); map_type_stop.at(MainReq::type).AsString() == MainReq::stop){
             db_.AddStop(ParseRequestsStops(map_type_stop));
         } else {
-            auto bus =  ParseRequestsBuses(map_type_data.AsDict());
+//            if( is_init_transport_router ) {
+//                // после загрузки всех остановок создаем маршрутизатор с необходимым количеством вершин
+//                tr_ = TransportRouter::TransportRouter(db_.GetStops().size());
+//                is_init_transport_router = true;
+//            }
+            auto bus = ParseRequestsBuses(map_type_data.AsDict());
             db_.AddBus(bus);
         }
     }
+
     for (const auto& map_type_data : vec_map){
         if (const auto& map_type_stop = map_type_data.AsDict(); map_type_stop.at(MainReq::type).AsString() == MainReq::stop){
             ParseRequestsStopsLenght(move(map_type_stop));
@@ -59,14 +74,23 @@ void JsonReader::ParseRequestsBase(json::Array&& vec_map)
 void JsonReader::ParseRequestsStat(const json::Array& vec_map)
 {
     using namespace domain;
+    using namespace MainReq;
 
     std::vector<domain::RequestOut> requests;
-    RequestOut result;
+
     requests.reserve(vec_map.size());
     for(const auto& req : vec_map){
         const auto cur_req = req.AsDict();
-        requests.push_back( { std::move(cur_req.at(MainReq::id).AsInt()), std::move(cur_req.at(MainReq::type).AsString()),
-                              cur_req.count(MainReq::name) != 0 ? std::move(cur_req.at(MainReq::name).AsString()) : "" } );
+        RequestOut request;
+        request.id = std::move(cur_req.at(id).AsInt());
+        request.type = std::move(cur_req.at(type).AsString());
+        if( request.type == bus || request.type == stop ) {
+            request.name = std::move(cur_req.at(name).AsString());
+        } else if ( request.type == route ) {
+            request.name = std::move(cur_req.at(from).AsString());
+            request.name_to = std::move(cur_req.at(to).AsString());
+        }
+        requests.emplace_back(std::move(request));
     }
     ExecRequestsStat(std::move(requests));
 }
@@ -81,6 +105,8 @@ void JsonReader::ExecRequestsStat(std::vector<domain::RequestOut>&& requests)
             vec.emplace_back(PrintResReqBus(req_hand_.GetBusStat(req.name), req.id));
         } else if(req.type == domain::MainReq::map) {
             vec.emplace_back(PrintResReqMap(req_hand_.RenderMap(), req.id));
+        } else if(req.type == domain::MainReq::route) {
+            vec.emplace_back(PrintResReqRoute(req_hand_.GetRouteStat(req.name, req.name_to.value()), req.id));
         }
     }
     json::Print(json::Document{json::Node{vec}}, std::cout);
@@ -164,11 +190,30 @@ void JsonReader::ParseRequestsRendSett(const json::Dict&& map)
     renderer_.SetUnicStops(req_hand_.GetUnicLexStopsIncludeBuses());
 }
 //----------------------------------------------------------------------------
+void JsonReader::ParseRequestsRoutSett(const json::Dict&& req)
+{
+    using namespace domain;
+    using namespace MainReq;
+    try{
+        RoutingSettings rout_set;
+        if(req.find(bus_wait_time) != req.end()){
+            rout_set.bus_wait_time_minut = req.at(bus_wait_time).AsInt();
+        }
+        if(req.find(bus_velocity) != req.end()){
+            rout_set.bus_velocity = req.at(bus_velocity).AsDouble();
+        }
+        tr_.rout_set_ = std::move(rout_set);
+    } catch(...) {
+        std::cout << "ParseRequestsRoutSett FAIL" << std::endl;
+        throw;
+    }
+}
+//----------------------------------------------------------------------------
 domain::Stop JsonReader::ParseRequestsStops(const json::Dict &req)
 {
     using namespace domain;
     try{
-        return {req.at(MainReq::name).AsString(), {req.at(MainReq::lat).AsDouble(), req.at(MainReq::lon).AsDouble()}};
+        return {req.at(MainReq::name).AsString(), {req.at(MainReq::lat).AsDouble(), req.at(MainReq::lon).AsDouble()}, 0};
     } catch (...) {
         std::cout << "Fail Stop" << std::endl;
         throw;
@@ -192,7 +237,7 @@ domain::Bus JsonReader::ParseRequestsBuses(const json::Dict& req)
             // если не кольцевой маршрут дублируем остановки в обратном порядке
             if(!req.at(MainReq::is_roundtrip).AsBool() && stops.size() >= 2){
                 size_t size = stops.size();
-                stops.reserve(size*2);
+                stops.reserve(size * 2);
                 std::vector<const domain::Stop*>::iterator it = stops.end() - 2;
                 for(size_t i = 0; i < size -1; ++i, --it){
                     stops.push_back(*it);
@@ -232,12 +277,10 @@ json::Dict JsonReader::PrintResReqBus(std::optional<domain::BusStat>&& bus_stat_
                                           .Key("request_id"s).Value(id)
                                           .Key("route_length"s).Value(static_cast<double>(lengh))
                                           .Key("stop_count"s).Value(static_cast<double>(count_stops))
-                                          .Key("unique_stop_count"s).Value(static_cast<double>(count_unic_stops))
-                                          .EndDict().Build().AsDict();
+                                          .Key("unique_stop_count"s).Value(static_cast<double>(count_unic_stops)).EndDict().Build().AsDict();
     } else {
         return json::Builder{}.StartDict().Key("request_id"s).Value(id)
-                                          .Key("error_message"s).Value("not found"s)
-                                          .EndDict().Build().AsDict();
+                                          .Key("error_message"s).Value("not found"s).EndDict().Build().AsDict();
     }
 }
 //----------------------------------------------------------------------------
@@ -256,12 +299,10 @@ json::Dict JsonReader::PrintResReqStop(std::optional< const std::unordered_set<c
             vec.push_back(std::string(bus));
         }
         return json::Builder{}.StartDict().Key("buses"s).Value(vec)
-                                          .Key("request_id"s).Value(id)
-                                          .EndDict().Build().AsDict();
+                                          .Key("request_id"s).Value(id).EndDict().Build().AsDict();
     } else {
         return json::Builder{}.StartDict().Key("request_id"s).Value(id)
-                                          .Key("error_message"s).Value("not found"s)
-                                          .EndDict().Build().AsDict();
+                                          .Key("error_message"s).Value("not found"s).EndDict().Build().AsDict();
     }
 }
 //----------------------------------------------------------------------------
@@ -274,8 +315,39 @@ json::Dict JsonReader::PrintResReqMap(std::optional<svg::Document>&& doc_opt, in
     std::ostringstream str;
     doc.Render(str);
     return json::Builder{}.StartDict().Key("map"s).Value(str.str())
-                                      .Key("request_id"s).Value(id)
-                                      .EndDict().Build().AsDict();
+                                      .Key("request_id"s).Value(id).EndDict().Build().AsDict();
+}
+//----------------------------------------------------------------------------
+json::Dict JsonReader::PrintResReqRoute(std::optional<domain::RoutStat>&& rout_stat_opt, int id)
+{
+    using namespace domain;
+    using TransportCatalogue::RoutStat;
+    if(! rout_stat_opt){
+        return json::Builder{}.StartDict().Key("request_id"s).Value(id)
+                                          .Key("error_message"s).Value("not found"s).EndDict().Build().AsDict();
+    }
+
+    const auto& rout_stat = *rout_stat_opt;
+    json::Array vec;
+    for( const RoutStat::VariantItem& item : rout_stat.items) {
+        json::Dict dict;
+        if(std::holds_alternative<RoutStat::ItemsWait>(item)) {
+            auto it = std::get<RoutStat::ItemsWait>(item);
+            dict.insert({"stop_name"s, it.stop_name});
+            dict.insert({"time"s, it.time});
+            dict.insert({"type"s, it.type});
+        } else if (std::holds_alternative<RoutStat::ItemsBus>(item)) {
+            auto it = std::get<RoutStat::ItemsBus>(item);
+            dict.insert({"bus"s, it.bus});
+            dict.insert({"span_count"s, static_cast<int>(it.span_count)});
+            dict.insert({"time"s, it.time});
+            dict.insert({"type"s, it.type});
+        }
+        vec.push_back(dict);
+    }
+    return json::Builder{}.StartDict().Key("items"s).Value(vec)
+                                      .Key("total_time"s).Value(rout_stat.total_time)
+                                      .Key("request_id"s).Value(id).EndDict().Build().AsDict();
 }
 //----------------------------------------------------------------------------
 }// namespace JsonReader
