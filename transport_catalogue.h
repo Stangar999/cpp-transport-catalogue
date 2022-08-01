@@ -38,20 +38,11 @@ public:
 
     void AddRangeStops(const StopsLenght& stops_lenght);
 
-    //void AddBusesFromStop(const std::string &bus_name, const std::vector<std::string>& buses_from_stop );
-
     void AddBusesFromStop(const Bus& bus);
 
-//    BusStat GetBusInfo(const Bus* bus) const;
-
-    //StopInfo GetStopInfo(const Stop* stop) const;
-
-     std::deque<Stop> GetStops() const { // для тестов
+    const std::deque<Stop>& GetStops() const {
         return stops_;
     };
-//     std::deque<Bus> GetBuses() const {// для тестов
-//        return buses_;
-//    };
 
     std::vector<const domain::Bus*> GetBusesLex() const ;
 
@@ -63,10 +54,7 @@ public:
 
     std::optional<const Stop*> FindStop(std::string_view stop_name) const ;
 
-    //const std::map<std::string_view, std::set<std::string_view>>& GetBusesFromStop() const;
     const std::map<std::string_view, std::unordered_set<const Bus*>>& GetBusesFromStop() const;
-
-    //const std::map<std::string_view, const std::vector<const Stop*>*>& GetBusesStops() const;
 
     const std::deque<Bus>& GetBuses() const;
 
@@ -77,15 +65,8 @@ private:
 
     std::deque<Bus> buses_;
 
-    //std::map<std::string, std::set<std::string>> buses_from_stop_;
-
-    //std::map<std::string_view, std::set<std::string_view>> buses_from_stop_;
-
     // список автобусов через остановку
     std::map<std::string_view, std::unordered_set<const Bus*>> buses_from_stop_; // нарушился алфавитный порядок но сделал так потому что в тренажере GetBusesByStop возвращала именно unordered_set
-
-    // список автобусов в лексиграфическом порядке и их список остановок
-    //std::map<std::string_view, const std::vector<const Stop*>*> buses_stops_;
 
     std::unordered_map<std::string_view, const Bus*> index_buses_;
 

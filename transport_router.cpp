@@ -16,9 +16,9 @@ void TransportRouter::CreateGraph(const TransportCatalogue::TransportCatalogue& 
                 const Stop* stop_to = *it_to;
                 lengh += db.GetRangeStops(prev_stop, stop_to);
                 prev_stop = stop_to;
-                double time_on_bus = lengh / GetMetrMinFromKmH( rout_set_.bus_velocity ); // minute
+                double time_on_bus = lengh / GetMetrMinFromKmH( settings_.bus_velocity ); // minute
                 // вес ребра учитывает и ожидание и время в пути, чтобы учитывать затраты на пересадки
-                graph.AddEdge( {stop_from->id, stop_to->id, (time_on_bus + rout_set_.bus_wait_time_minut) } );
+                graph.AddEdge( {stop_from->id, stop_to->id, (time_on_bus + settings_.bus_wait_time_minut) } );
                 // запоминает имя автобуса и количество прогонов между остановками
                 edges_buses_.push_back({bus.name, static_cast<size_t>(std::distance(it_from, it_to))});
             }
@@ -27,7 +27,7 @@ void TransportRouter::CreateGraph(const TransportCatalogue::TransportCatalogue& 
     opt_graph_ = std::move(graph);
 }
 //----------------------------------------------------------------------------
-std::optional<RoutStat> TransportRouter::GetRoutStat(size_t id_stop_from, size_t id_stop_to) const {
+std::optional<RoutStat> TransportRouter::GetRouteStat(size_t id_stop_from, size_t id_stop_to) const {
     // попытка построить маршрут
     const OptRouteInfo opt_route_info = GetRouter()->BuildRoute(id_stop_from, id_stop_to);
     // проверка маршрута
@@ -44,9 +44,9 @@ std::optional<RoutStat> TransportRouter::GetRoutStat(size_t id_stop_from, size_t
         const auto& edge = opt_graph_.value().GetEdge(edge_id);
         // номер автобуса едущий по этому ребру и количество прогонов в ребре
         const auto [bus_num, span_count] = edges_buses_[edge_id];
-        items.push_back(RoutStat::ItemsWait{"Wait", static_cast<double>(rout_set_.bus_wait_time_minut), std::string(id_stopes_[edge.from])});
+        items.push_back(RoutStat::ItemsWait{"Wait", static_cast<double>(settings_.bus_wait_time_minut), std::string(id_stopes_[edge.from])});
         // вычитаем из веса время ожидания
-        items.push_back(RoutStat::ItemsBus{"Bus", edge.weight - static_cast<double>(rout_set_.bus_wait_time_minut), span_count, std::string(bus_num)});
+        items.push_back(RoutStat::ItemsBus{"Bus", edge.weight - static_cast<double>(settings_.bus_wait_time_minut), span_count, std::string(bus_num)});
     }
     return RoutStat{total_time, items};
 }

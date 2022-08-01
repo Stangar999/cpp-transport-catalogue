@@ -48,17 +48,10 @@ void JsonReader::ParseRequestsBase(json::Array&& vec_map)
     };
     std::sort(vec_map.begin(), vec_map.end(), compare);
 
-//    // маршрутизатор не инициализирован
-//    bool is_init_transport_router = false;
     for(const auto& map_type_data : vec_map){
         if(const auto& map_type_stop = map_type_data.AsDict(); map_type_stop.at(MainReq::type).AsString() == MainReq::stop){
             db_.AddStop(ParseRequestsStops(map_type_stop));
         } else {
-//            if( is_init_transport_router ) {
-//                // после загрузки всех остановок создаем маршрутизатор с необходимым количеством вершин
-//                tr_ = TransportRouter::TransportRouter(db_.GetStops().size());
-//                is_init_transport_router = true;
-//            }
             auto bus = ParseRequestsBuses(map_type_data.AsDict());
             db_.AddBus(bus);
         }
@@ -202,7 +195,7 @@ void JsonReader::ParseRequestsRoutSett(const json::Dict&& req)
         if(req.find(bus_velocity) != req.end()){
             rout_set.bus_velocity = req.at(bus_velocity).AsDouble();
         }
-        tr_.rout_set_ = std::move(rout_set);
+        tr_.settings_ = std::move(rout_set);
     } catch(...) {
         std::cout << "ParseRequestsRoutSett FAIL" << std::endl;
         throw;

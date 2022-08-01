@@ -20,10 +20,10 @@ public:
     void CreateGraph(const TransportCatalogue::TransportCatalogue& db);
 
     // возвращает маршрут и статистику по нему
-    std::optional<RoutStat> GetRoutStat(size_t id_stop_from, size_t id_stop_to) const ;
+    std::optional<RoutStat> GetRouteStat(size_t id_stop_from, size_t id_stop_to) const ;
 
     // параметры маршрута скорость, ожидание
-    RoutingSettings rout_set_;
+    RoutingSettings settings_;
 
     // Граф не создан
     bool GetGraphIsNoInit() const;

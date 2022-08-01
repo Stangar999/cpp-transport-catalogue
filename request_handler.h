@@ -39,9 +39,6 @@ public:
     // Возвращает маршруты, проходящие через
     std::optional<const std::unordered_set<const domain::Bus*>*> GetBusesByStop(const std::string_view& stop_name) const;
 
-    // Возвращает перечень автобусов в лекс порядке и перечень их остановок в порядке следования
-//    const std::map<std::string_view, const std::vector<const domain::Stop*>*>& GetBusesStops() const ;
-
     std::vector<const domain::Bus*> GetBusesLex() const;
 
     // Возвращает перечень уникальных остановок в лекс порядке через которые проходят маршруты
@@ -49,6 +46,7 @@ public:
 
     svg::Document RenderMap() const;
 
+    // если я правильно понял о каком методе идет речь, то он уже есть строка 37
 private:
     domain::BusStat CreateBusStat (const domain::Bus* bus) const;
 

@@ -25,7 +25,7 @@ std::optional<domain::RoutStat> RequestHandler::GetRouteStat(std::string_view st
     if(tr_.GetGraphIsNoInit()) {
         tr_.CreateGraph(db_);
     }
-    return tr_.GetRoutStat(db_.FindStop(stop_from).value()->id, db_.FindStop(stop_to).value()->id);
+    return tr_.GetRouteStat(db_.FindStop(stop_from).value()->id, db_.FindStop(stop_to).value()->id);
 }
 //----------------------------------------------------------------------------
 std::optional< const std::unordered_set<const domain::Bus*>* > RequestHandler::GetBusesByStop(const std::string_view& stop_name) const
