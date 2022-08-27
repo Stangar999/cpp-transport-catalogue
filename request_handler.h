@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <unordered_set>
+#include <filesystem>
 
 #include "transport_catalogue.h"
 #include "domain.h"
@@ -26,7 +27,7 @@ class RequestHandler {
 
 public:
     // MapRenderer понадобится в следующей части итогового проекта
-    RequestHandler(const TransportCatalogue::TransportCatalogue& db,
+    RequestHandler(TransportCatalogue::TransportCatalogue& db,
                    TransportRouter::TransportRouter& tr,
                    renderer::MapRenderer& renderer);
 
@@ -46,11 +47,15 @@ public:
 
     svg::Document RenderMap() const;
 
+    void CallDsrlz(const std::filesystem::path& path);
+
+    void CallSrlz(const std::filesystem::path& path) const;
+
     // если я правильно понял о каком методе идет речь, то он уже есть строка 37
 private:
     domain::BusStat CreateBusStat (const domain::Bus* bus) const;
 
-    const TransportCatalogue::TransportCatalogue& db_;
+    TransportCatalogue::TransportCatalogue& db_;
 
     TransportRouter::TransportRouter& tr_;
 

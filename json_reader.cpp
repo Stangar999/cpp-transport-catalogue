@@ -6,20 +6,45 @@
 namespace JsonReader
 {
 //----------------------------------------------------------------------------
-JsonReader::JsonReader(std::istream &in,
-                       TransportCatalogue::TransportCatalogue& db,
+JsonReader::JsonReader(TransportCatalogue::TransportCatalogue& db,
                        TransportRouter::TransportRouter& tr,
-                       const RequestHandler& req_hand,
-                       renderer::MapRenderer& renderer)
+                       RequestHandler& req_hand,
+                       renderer::MapRenderer& renderer
+                       /*std::filesystem::path& path*/)
     :db_(db)
     ,tr_(tr)
     ,req_hand_(req_hand)
     ,renderer_(renderer)
+//    ,path_(path)
+{
+//    using namespace domain;
+
+//    auto main_map = std::move(json::Load(in).GetRoot().AsDict());
+
+//    if(auto it = main_map.find(MainReq::base); it != main_map.end()){
+//        auto vec_map = std::move(it->second.AsArray());
+//        ParseRequestsBase(std::move(vec_map));
+//    }
+//    if(auto it = main_map.find(MainReq::render_settings); it != main_map.end()){
+//        auto map = std::move(it->second.AsDict());
+//        ParseRequestsRendSett(std::move(map));
+//    }
+//    if(auto it = main_map.find(MainReq::routing_settings); it != main_map.end()){
+//        auto map = std::move(it->second.AsDict());
+//        ParseRequestsRoutSett(std::move(map));
+//    }
+//    if(auto it = main_map.find(MainReq::stat); it != main_map.end()){
+//        auto vec_map = std::move(it->second.AsArray());
+//        ParseRequestsStat(vec_map);
+//    }
+
+}
+//----------------------------------------------------------------------------
+void JsonReader::ParseJsonMakeBase(std::istream& in)
 {
     using namespace domain;
 
     auto main_map = std::move(json::Load(in).GetRoot().AsDict());
-
     if(auto it = main_map.find(MainReq::base); it != main_map.end()){
         auto vec_map = std::move(it->second.AsArray());
         ParseRequestsBase(std::move(vec_map));
@@ -32,11 +57,42 @@ JsonReader::JsonReader(std::istream &in,
         auto map = std::move(it->second.AsDict());
         ParseRequestsRoutSett(std::move(map));
     }
+    std::string path;
+    if(auto it = main_map.find(MainReq::srlzt_settings); it != main_map.end()){
+        auto map = std::move(it->second.AsDict());
+        ParseRequestsSrlz(std::move(map), path);
+    }
+    req_hand_.CallSrlz(path);
+}
+//----------------------------------------------------------------------------
+void JsonReader::ParseJsonProcessRequests(std::istream& in)
+{
+    using namespace domain;
+
+    auto main_map = std::move(json::Load(in).GetRoot().AsDict());
+    std::string path;
+    if(auto it = main_map.find(MainReq::srlzt_settings); it != main_map.end()){
+        auto map = std::move(it->second.AsDict());
+        ParseRequestsSrlz(std::move(map), path);
+    }
+    req_hand_.CallDsrlz(path);
     if(auto it = main_map.find(MainReq::stat); it != main_map.end()){
         auto vec_map = std::move(it->second.AsArray());
         ParseRequestsStat(vec_map);
     }
-
+}
+//----------------------------------------------------------------------------
+void JsonReader::ParseRequestsSrlz(const json::Dict&& req, std::string& path)
+{
+    using namespace domain;
+//    try{
+    if(req.find(MainReq::file) != req.end()){
+        path = std::move(req.at(MainReq::file).AsString());
+    }
+//    } catch(...) {
+//        std::cout << "ParseRequestsSrlz FAIL" << std::endl;
+//        throw;
+//    }
 }
 //----------------------------------------------------------------------------
 void JsonReader::ParseRequestsBase(json::Array&& vec_map)

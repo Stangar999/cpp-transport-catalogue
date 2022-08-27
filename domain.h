@@ -11,33 +11,46 @@ namespace domain
 
 namespace MainReq{
 using namespace std::literals;
+// типы запросов
+  // make_base
     const std::string base = "base_requests"s;
-    const std::string stat = "stat_requests"s;
     const std::string render_settings = "render_settings"s;
     const std::string routing_settings = "routing_settings"s;
-      const std::string bus_velocity = "bus_velocity"s;
-      const std::string bus_wait_time = "bus_wait_time"s;
+  // process_requests
+    const std::string stat = "stat_requests"s;
+  // common
+    const std::string srlzt_settings = "serialization_settings"s;
 
-    const std::string type = "type"s;
-      const std::string bus = "Bus"s;
-      const std::string stop = "Stop"s;
-      const std::string route = "Route"s;
-        const std::string from = "from"s;
-        const std::string to = "to"s;
+// параметры serialization_settings
+    const std::string file = "file"s;
 
-    const std::string stops = "stops"s;
-    const std::string is_roundtrip = "is_roundtrip"s;
+// параметры routing_settings
+    const std::string bus_velocity = "bus_velocity"s;
+    const std::string bus_wait_time = "bus_wait_time"s;
 
-
+// параметры общие для base_requests
     const std::string name = "name"s;
+    const std::string type = "type"s;
+
+// параметры base_requests type Stop
     const std::string lat = "latitude"s;
     const std::string lon = "longitude"s;
     const std::string road_distances = "road_distances"s;
 
+// параметры base_requests type Bus
+    const std::string is_roundtrip = "is_roundtrip"s;
+    const std::string stops = "stops"s;
+
+// параметры stat_requests
+    const std::string id = "id"s;
+    const std::string route = "Route"s;
+      const std::string from = "from"s;
+      const std::string to = "to"s;
     const std::string map = "Map"s;
 
-    const std::string id = "id"s;
-
+// параметры общие для stat_requests и base_requests
+    const std::string bus = "Bus"s;
+    const std::string stop = "Stop"s;
 }
 
 struct Request{
@@ -103,30 +116,6 @@ struct RoutingSettings{
 
 struct RoutStat{
 
-//    struct Items{
-//        //Items() = default;
-//        virtual ~Items(){};
-//        std::string type;
-//        double time = 0;
-//    };
-
-//    struct ItemsWait: public Items {
-//        //ItemsWait() = default;
-//        //std::string type;
-//        //double time = 0;
-//        std::string stop_name;
-//    };
-
-//    struct ItemsBus: public Items {
-//        //std::string type;
-//        //double time = 0;
-//        ItemsBus() {};
-//        size_t span_count = 0;
-//        std::string bus;
-//    };
-// dynamic_cast<RoutStat::ItemsWait*>(item);
-
-
     struct ItemsWait {
         std::string type;
         double time = 0;
@@ -144,8 +133,6 @@ struct RoutStat{
 
     double total_time = 0; // minute
     std::vector<VariantItem> items;
-
-    //std::vector<Items*> items;
 };
 
 double ComputeDistance(const Stop* from_stop, const Stop* to_stop);

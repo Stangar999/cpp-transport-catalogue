@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include <filesystem>
 #include <iostream>
 
 //#include "json.h"
@@ -19,11 +20,23 @@ using namespace std::literals;
 class JsonReader
 {
 public:
-    JsonReader(std::istream& in, TransportCatalogue::TransportCatalogue& db,
+    JsonReader(TransportCatalogue::TransportCatalogue& db,
                TransportRouter::TransportRouter& tr,
-               const RequestHandler& req_hand,
-               renderer::MapRenderer& renderer);
+               RequestHandler& req_hand,
+               renderer::MapRenderer& renderer
+               /*std::filesystem::path& path*/);
+
+    /** обработка .json с вводными данными из которых сформируется БД */
+    void ParseJsonMakeBase(std::istream& in);
+
+    /** обработка .json с запросами к готовой БД */
+    void ParseJsonProcessRequests(std::istream& in);
+
+//    static json::Dict main_map_;
+
 private:
+    void ParseRequestsSrlz(const json::Dict&& req, std::string& path);
+
     void ParseRequestsBase(json::Array&& vec_map);
 
     domain::Stop ParseRequestsStops(const json::Dict& req);
@@ -52,10 +65,14 @@ private:
 
     TransportRouter::TransportRouter& tr_;
 
-    const RequestHandler& req_hand_;
+    RequestHandler& req_hand_;
 
     renderer::MapRenderer& renderer_;
+
+//    std::filesystem::path path_;
 };
+
+//static json::Dict /*JsonReader::*/main_map_ = json::Dict();
 
 }// namespace JsonReader
 

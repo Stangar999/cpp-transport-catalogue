@@ -1,7 +1,8 @@
 ﻿#include "request_handler.h"
+#include "serialization.h"
 
 //----------------------------------------------------------------------------
-RequestHandler::RequestHandler(const TransportCatalogue::TransportCatalogue& db,
+RequestHandler::RequestHandler( TransportCatalogue::TransportCatalogue& db,
                                TransportRouter::TransportRouter& tr,
                                renderer::MapRenderer& renderer)
     :db_(db)
@@ -64,6 +65,18 @@ const std::vector<const domain::Stop*> RequestHandler::GetUnicLexStopsIncludeBus
 svg::Document RequestHandler::RenderMap() const
 {
     return renderer_.GetDocMapBus();
+}
+//----------------------------------------------------------------------------
+void RequestHandler::CallDsrlz(const std::filesystem::path& path)
+{
+    Serialization d_srlz;
+    d_srlz.Deserialize(path, db_);
+}
+//----------------------------------------------------------------------------
+void RequestHandler::CallSrlz(const std::filesystem::path& path) const
+{
+    Serialization srlz;
+    srlz.Serialize(db_, path);
 }
 //----------------------------------------------------------------------------
 domain::BusStat RequestHandler::CreateBusStat(const domain::Bus* bus) const

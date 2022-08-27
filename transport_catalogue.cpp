@@ -101,4 +101,9 @@ const std::deque<Bus>& TransportCatalogue::GetBuses() const {
     return buses_;
 }
 //----------------------------------------------------------------------------
+const TransportCatalogue::UmapRangStop& TransportCatalogue::GetIndexRageStop() const
+{
+    return index_rage_;
+}
+//----------------------------------------------------------------------------
 } // namespace TransportCatalogue

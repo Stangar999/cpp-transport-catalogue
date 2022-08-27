@@ -12,9 +12,11 @@ SOURCES += \
         main.cpp \
         map_renderer.cpp \
         request_handler.cpp \
+        serialization.cpp \
         svg.cpp \
         tests.cpp \
         transport_catalogue.cpp \
+        transport_catalogue.pb.cc \
         transport_router.cpp
 
 HEADERS += \
@@ -28,7 +30,20 @@ HEADERS += \
   ranges.h \
   request_handler.h \
   router.h \
+  serialization.h \
   svg.h \
   tests.h \
   transport_catalogue.h \
+  transport_catalogue.pb.h \
   transport_router.h
+
+win32:CONFIG(release, debug|release): LIBS += -L$$PWD/package/lib/ -lprotobuf
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/package/lib/ -lprotobufd
+
+INCLUDEPATH += $$PWD/package/include
+DEPENDPATH += $$PWD/package/include
+
+win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/package/lib/libprotobuf.a
+else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/package/lib/libprotobufd.a
+else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$PWD/package/lib/protobuf.lib
+else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$PWD/package/lib/protobufd.lib

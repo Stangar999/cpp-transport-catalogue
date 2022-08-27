@@ -29,6 +29,7 @@ using namespace domain;
 
 class TransportCatalogue
 {
+using UmapRangStop = std::unordered_map<std::pair<const Stop*, const Stop*>, size_t, detail::HasherStopes>;
 public:
     TransportCatalogue();
 
@@ -58,6 +59,8 @@ public:
 
     const std::deque<Bus>& GetBuses() const;
 
+    const UmapRangStop& GetIndexRageStop() const;
+
 private:
     std::deque<Stop> stops_;
 
@@ -70,7 +73,7 @@ private:
 
     std::unordered_map<std::string_view, const Bus*> index_buses_;
 
-    std::unordered_map<std::pair<const Stop*, const Stop*>, size_t, detail::HasherStopes> index_rage_;
+    UmapRangStop index_rage_;
 
     size_t counter_stop_ = 0;
 };
