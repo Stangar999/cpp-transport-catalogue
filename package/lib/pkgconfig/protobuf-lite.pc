@@ -1,0 +1,11 @@
+prefix=C:/Users/locki/Project/Qt project/yandex/Y_practica/Home/5_Razraabotka_bibkiotek/7_Serelizaciy_ProtoBuf/protobuf-cpp-3.21.5/protobuf/package
+exec_prefix=C:/Users/locki/Project/Qt project/yandex/Y_practica/Home/5_Razraabotka_bibkiotek/7_Serelizaciy_ProtoBuf/protobuf-cpp-3.21.5/protobuf/package
+libdir=C:/Users/locki/Project/Qt project/yandex/Y_practica/Home/5_Razraabotka_bibkiotek/7_Serelizaciy_ProtoBuf/protobuf-cpp-3.21.5/protobuf/package/lib
+includedir=C:/Users/locki/Project/Qt project/yandex/Y_practica/Home/5_Razraabotka_bibkiotek/7_Serelizaciy_ProtoBuf/protobuf-cpp-3.21.5/protobuf/package/include
+
+Name: Protocol Buffers
+Description: Google's Data Interchange Format
+Version: 3.21.5.0
+Libs: -L${libdir} -lprotobuf-lite 
+Cflags: -I${includedir}
+Conflicts: protobuf
