@@ -147,6 +147,8 @@ public:
 
     svg::Document GetDocMapBus();
 
+    const RenderSettings& GetRenderSettings() const;
+
 private:
 
     SphereProjector CreateProj();

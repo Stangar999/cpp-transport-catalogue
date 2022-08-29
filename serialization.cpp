@@ -5,11 +5,31 @@ Serialization::Serialization()
 {
 
 }
-
+//----------------------------------------------------------------------------
 void Serialization::Serialize(const TransportCatalogue::TransportCatalogue& t_c
+                              , const renderer::MapRenderer& m_r
                               , const std::filesystem::path& path) const
 {
     t_c_srlz::TransportCatalogue s_t_c;
+    SerializeTC(s_t_c, t_c);
+    SerializeRS(s_t_c, m_r);
+    std::ofstream out(path, std::ios::binary);
+    s_t_c.SerializeToOstream(&out);
+}
+//----------------------------------------------------------------------------
+void Serialization::Deserialize(const std::filesystem::path& path
+                              , TransportCatalogue::TransportCatalogue& t_c
+                              , renderer::MapRenderer& m_r) const
+{
+    std::ifstream in(path, std::ios::binary);
+    t_c_srlz::TransportCatalogue s_t_c;
+    s_t_c.ParseFromIstream(&in);
+    DeserializeTC(s_t_c, t_c);
+    DeserializeRS(s_t_c, m_r);
+}
+//----------------------------------------------------------------------------
+void Serialization::SerializeTC(t_c_srlz::TransportCatalogue& s_t_c, const TransportCatalogue::TransportCatalogue& t_c) const
+{
     for(const auto& stop : t_c.GetStops()) {
         t_c_srlz::Stop s_stop;
         s_stop.set_name(stop.name);
@@ -40,18 +60,41 @@ void Serialization::Serialize(const TransportCatalogue::TransportCatalogue& t_c
         s_stop_lenght.set_lenght(struc.second);
         *s_t_c.add_list_stop_lenght() = std::move(s_stop_lenght);
     }
-
-    std::ofstream out(path, std::ios::binary);
-    s_t_c.SerializeToOstream(&out);
 }
-
-void Serialization::Deserialize(const std::filesystem::path& path
-                              , TransportCatalogue::TransportCatalogue& t_c) const
+//----------------------------------------------------------------------------
+void Serialization::SerializeRS(t_c_srlz::TransportCatalogue& s_t_c, const renderer::MapRenderer& m_r) const
 {
-    std::ifstream in(path, std::ios::binary);
-    t_c_srlz::TransportCatalogue s_t_c;
-    s_t_c.ParseFromIstream(&in);
-
+    const renderer::RenderSettings& r_s = m_r.GetRenderSettings();
+    r_s_srlz::RenderSettings& s_r_s = *s_t_c.mutable_render_settings();
+    s_r_s.set_width(r_s.width);
+    s_r_s.set_height(r_s.height);
+    s_r_s.set_padding(r_s.padding);
+    s_r_s.set_line_width(r_s.line_width);
+    s_r_s.set_stop_radius(r_s.stop_radius);
+    s_r_s.set_bus_label_font_size(r_s.bus_label_font_size);
+    r_s_srlz::Point p_bus;
+    p_bus.set_x(r_s.bus_label_offset.x);
+    p_bus.set_y(r_s.bus_label_offset.y);
+    *s_r_s.mutable_bus_label_offset() = std::move(p_bus);
+    s_r_s.set_stop_label_font_size(r_s.stop_label_font_size);
+    r_s_srlz::Point p_stop;
+    p_stop.set_x(r_s.stop_label_offset.x);
+    p_stop.set_y(r_s.stop_label_offset.y);
+    *s_r_s.mutable_stop_label_offset() = std::move(p_stop);
+    *s_r_s.mutable_underlayer_color() = GetCurrentVariantSrlzColor(r_s.underlayer_color);
+    s_r_s.set_underlayer_width(r_s.underlayer_width);
+    bool is_clear = false;
+    for(const auto& color : r_s.color_palette) {
+         if(! is_clear) {
+             s_r_s.clear_color_palette(); // очистка значений по умолчанию
+             is_clear =true;
+         }
+        *s_r_s.add_color_palette() = GetCurrentVariantSrlzColor(color);
+    }
+}
+//----------------------------------------------------------------------------
+void Serialization::DeserializeTC(const t_c_srlz::TransportCatalogue& s_t_c, TransportCatalogue::TransportCatalogue& t_c) const
+{
     size_t count_stop =  s_t_c.list_stop_size();
     for(size_t i = 0; i < count_stop; ++i) {
         domain::Stop stop;
@@ -82,5 +125,82 @@ void Serialization::Deserialize(const std::filesystem::path& path
         stop_lenght.lenght = s_t_c.list_stop_lenght(i).lenght();
         t_c.AddRangeStops(std::move(stop_lenght));
     }
+}
+//----------------------------------------------------------------------------
+void Serialization::DeserializeRS(const t_c_srlz::TransportCatalogue& s_t_c, renderer::MapRenderer& m_r) const
+{
+    renderer::RenderSettings render_settings;
+    render_settings.width = s_t_c.render_settings().width();
+    render_settings.height = s_t_c.render_settings().height();
+    render_settings.padding = s_t_c.render_settings().padding();
+    render_settings.line_width = s_t_c.render_settings().line_width();
+    render_settings.stop_radius = s_t_c.render_settings().stop_radius();
+    render_settings.bus_label_font_size = s_t_c.render_settings().bus_label_font_size();
+    render_settings.bus_label_offset = {s_t_c.render_settings().bus_label_offset().x()
+                                       ,s_t_c.render_settings().bus_label_offset().y()};
+    render_settings.stop_label_font_size = s_t_c.render_settings().stop_label_font_size();
+    render_settings.stop_label_offset = {s_t_c.render_settings().stop_label_offset().x()
+                                         ,s_t_c.render_settings().stop_label_offset().y()};
+    render_settings.underlayer_color = GetCurrentVariantColor(s_t_c.render_settings().underlayer_color());
+    render_settings.underlayer_width = s_t_c.render_settings().underlayer_width();
+    bool is_clear = false;
+    for(int i = 0; i < s_t_c.render_settings().color_palette_size(); ++i) {
+        if(! is_clear) {
+            render_settings.color_palette.clear(); // очистка значений по умолчанию
+            is_clear =true;
+        }
+        render_settings.color_palette.emplace_back(GetCurrentVariantColor(s_t_c.render_settings().color_palette(i)));
+    }
+    m_r.SetRenderSettings(std::move(render_settings));
 
 }
+//----------------------------------------------------------------------------
+r_s_srlz::Color Serialization::GetCurrentVariantSrlzColor(const svg::Color& color) const {
+    r_s_srlz::Color s_color;
+    if(std::holds_alternative<std::string>(color)) {
+        *s_color.mutable_color() = std::get<std::string>(color);
+    } else if (std::holds_alternative<svg::Rgb>(color)) {
+        const svg::Rgb& rgb = std::get<svg::Rgb>(color);
+        s_color.mutable_rgb()->set_red(rgb.red);
+        s_color.mutable_rgb()->set_green(rgb.green);
+        s_color.mutable_rgb()->set_blue(rgb.blue);
+    } else if (std::holds_alternative<svg::Rgba>(color)) {
+        const svg::Rgba& rgba = std::get<svg::Rgba>(color);
+        s_color.mutable_rgba()->set_red(rgba.red);
+        s_color.mutable_rgba()->set_green(rgba.green);
+        s_color.mutable_rgba()->set_blue(rgba.blue);
+        s_color.mutable_rgba()->set_opacity(rgba.opacity);
+    }
+    return s_color;
+}
+//----------------------------------------------------------------------------
+svg::Color Serialization::GetCurrentVariantColor(const r_s_srlz::Color& s_color) const {
+    svg::Color color;
+    switch (s_color.ColorVariant_case())
+    {
+    case r_s_srlz::Color::ColorVariantCase::kColor:
+        color = s_color.color();
+        break;
+    case r_s_srlz::Color::ColorVariantCase::kRgb: {
+        svg::Rgb rgb;
+        rgb.red = s_color.rgb().red();
+        rgb.green = s_color.rgb().green();
+        rgb.blue = s_color.rgb().blue();
+        color = std::move(rgb);
+        break;
+    }
+    case r_s_srlz::Color::ColorVariantCase::kRgba: {
+        svg::Rgba rgba;
+        rgba.red = s_color.rgba().red();
+        rgba.green = s_color.rgba().green();
+        rgba.blue = s_color.rgba().blue();
+        rgba.opacity = s_color.rgba().opacity();
+        color = std::move(rgba);
+        break;
+    }
+    default:
+        break;
+    }
+    return color;
+}
+//----------------------------------------------------------------------------

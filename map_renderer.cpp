@@ -137,6 +137,11 @@ void MapRenderer::DrawNameBus(svg::Document& doc, const SphereProjector& proj,
     doc.Add(text);
 }
 //----------------------------------------------------------------------------
+const RenderSettings& MapRenderer::GetRenderSettings() const
+{
+    return render_settings_;
+}
+//----------------------------------------------------------------------------
 void MapRenderer::SetUnicStops(const std::vector<const domain::Stop*>&& stopes) {
     stopes_ = std::move(stopes);
 }

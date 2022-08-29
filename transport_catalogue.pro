@@ -11,9 +11,11 @@ SOURCES += \
         json_reader.cpp \
         main.cpp \
         map_renderer.cpp \
+        map_renderer.pb.cc \
         request_handler.cpp \
         serialization.cpp \
         svg.cpp \
+        svg.pb.cc \
         tests.cpp \
         transport_catalogue.cpp \
         transport_catalogue.pb.cc \
@@ -27,11 +29,13 @@ HEADERS += \
   json_builder.h \
   json_reader.h \
   map_renderer.h \
+  map_renderer.pb.h \
   ranges.h \
   request_handler.h \
   router.h \
   serialization.h \
   svg.h \
+  svg.pb.h \
   tests.h \
   transport_catalogue.h \
   transport_catalogue.pb.h \

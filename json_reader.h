@@ -23,16 +23,13 @@ public:
     JsonReader(TransportCatalogue::TransportCatalogue& db,
                TransportRouter::TransportRouter& tr,
                RequestHandler& req_hand,
-               renderer::MapRenderer& renderer
-               /*std::filesystem::path& path*/);
+               renderer::MapRenderer& renderer);
 
     /** обработка .json с вводными данными из которых сформируется БД */
     void ParseJsonMakeBase(std::istream& in);
 
     /** обработка .json с запросами к готовой БД */
     void ParseJsonProcessRequests(std::istream& in);
-
-//    static json::Dict main_map_;
 
 private:
     void ParseRequestsSrlz(const json::Dict&& req, std::string& path);
@@ -68,11 +65,8 @@ private:
     RequestHandler& req_hand_;
 
     renderer::MapRenderer& renderer_;
-
-//    std::filesystem::path path_;
 };
 
-//static json::Dict /*JsonReader::*/main_map_ = json::Dict();
 
 }// namespace JsonReader
 

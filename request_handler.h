@@ -55,9 +55,9 @@ public:
 private:
     domain::BusStat CreateBusStat (const domain::Bus* bus) const;
 
-    TransportCatalogue::TransportCatalogue& db_;
+    TransportCatalogue::TransportCatalogue& t_c_;
 
     TransportRouter::TransportRouter& tr_;
 
-    renderer::MapRenderer& renderer_;
+    renderer::MapRenderer& m_r_;
 };

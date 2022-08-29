@@ -85,6 +85,7 @@ PROTOBUF_CONSTEXPR TransportCatalogue::TransportCatalogue(
     /*decltype(_impl_.list_stop_)*/{}
   , /*decltype(_impl_.list_bus_)*/{}
   , /*decltype(_impl_.list_stop_lenght_)*/{}
+  , /*decltype(_impl_.render_settings_)*/nullptr
   , /*decltype(_impl_._cached_size_)*/{}} {}
 struct TransportCatalogueDefaultTypeInternal {
   PROTOBUF_CONSTEXPR TransportCatalogueDefaultTypeInternal()
@@ -145,6 +146,7 @@ const uint32_t TableStruct_transport_5fcatalogue_2eproto::offsets[] PROTOBUF_SEC
   PROTOBUF_FIELD_OFFSET(::t_c_srlz::TransportCatalogue, _impl_.list_stop_),
   PROTOBUF_FIELD_OFFSET(::t_c_srlz::TransportCatalogue, _impl_.list_bus_),
   PROTOBUF_FIELD_OFFSET(::t_c_srlz::TransportCatalogue, _impl_.list_stop_lenght_),
+  PROTOBUF_FIELD_OFFSET(::t_c_srlz::TransportCatalogue, _impl_.render_settings_),
 };
 static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, -1, sizeof(::t_c_srlz::Coord)},
@@ -163,23 +165,28 @@ static const ::_pb::Message* const file_default_instances[] = {
 };
 
 const char descriptor_table_protodef_transport_5fcatalogue_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
-  "\n\031transport_catalogue.proto\022\010t_c_srlz\",\n"
-  "\005Coord\022\020\n\010latitude\030\001 \001(\001\022\021\n\tlongitude\030\002 "
-  "\001(\001\"@\n\004Stop\022\014\n\004name\030\001 \001(\t\022\036\n\005coord\030\002 \001(\013"
-  "2\017.t_c_srlz.Coord\022\n\n\002id\030\003 \001(\004\"A\n\003Bus\022\014\n\004"
-  "name\030\001 \001(\t\022\026\n\016list_name_stop\030\002 \003(\t\022\024\n\014is"
-  "_roundtrip\030\003 \001(\010\"A\n\013StopsLenght\022\021\n\tfrom_"
-  "stop\030\001 \001(\t\022\017\n\007to_stop\030\002 \001(\t\022\016\n\006lenght\030\003 "
-  "\001(\004\"\211\001\n\022TransportCatalogue\022!\n\tlist_stop\030"
-  "\001 \003(\0132\016.t_c_srlz.Stop\022\037\n\010list_bus\030\002 \003(\0132"
-  "\r.t_c_srlz.Bus\022/\n\020list_stop_lenght\030\003 \003(\013"
-  "2\025.t_c_srlz.StopsLenghtb\006proto3"
+  "\n\031transport_catalogue.proto\022\010t_c_srlz\032\022m"
+  "ap_renderer.proto\",\n\005Coord\022\020\n\010latitude\030\001"
+  " \001(\001\022\021\n\tlongitude\030\002 \001(\001\"@\n\004Stop\022\014\n\004name\030"
+  "\001 \001(\t\022\036\n\005coord\030\002 \001(\0132\017.t_c_srlz.Coord\022\n\n"
+  "\002id\030\003 \001(\004\"A\n\003Bus\022\014\n\004name\030\001 \001(\t\022\026\n\016list_n"
+  "ame_stop\030\002 \003(\t\022\024\n\014is_roundtrip\030\003 \001(\010\"A\n\013"
+  "StopsLenght\022\021\n\tfrom_stop\030\001 \001(\t\022\017\n\007to_sto"
+  "p\030\002 \001(\t\022\016\n\006lenght\030\003 \001(\004\"\274\001\n\022TransportCat"
+  "alogue\022!\n\tlist_stop\030\001 \003(\0132\016.t_c_srlz.Sto"
+  "p\022\037\n\010list_bus\030\002 \003(\0132\r.t_c_srlz.Bus\022/\n\020li"
+  "st_stop_lenght\030\003 \003(\0132\025.t_c_srlz.StopsLen"
+  "ght\0221\n\017render_settings\030\004 \001(\0132\030.r_s_srlz."
+  "RenderSettingsb\006proto3"
   ;
+static const ::_pbi::DescriptorTable* const descriptor_table_transport_5fcatalogue_2eproto_deps[1] = {
+  &::descriptor_table_map_5frenderer_2eproto,
+};
 static ::_pbi::once_flag descriptor_table_transport_5fcatalogue_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_transport_5fcatalogue_2eproto = {
-    false, false, 431, descriptor_table_protodef_transport_5fcatalogue_2eproto,
+    false, false, 502, descriptor_table_protodef_transport_5fcatalogue_2eproto,
     "transport_catalogue.proto",
-    &descriptor_table_transport_5fcatalogue_2eproto_once, nullptr, 0, 5,
+    &descriptor_table_transport_5fcatalogue_2eproto_once, descriptor_table_transport_5fcatalogue_2eproto_deps, 1, 5,
     schemas, file_default_instances, TableStruct_transport_5fcatalogue_2eproto::offsets,
     file_level_metadata_transport_5fcatalogue_2eproto, file_level_enum_descriptors_transport_5fcatalogue_2eproto,
     file_level_service_descriptors_transport_5fcatalogue_2eproto,
@@ -1256,8 +1263,19 @@ void StopsLenght::InternalSwap(StopsLenght* other) {
 
 class TransportCatalogue::_Internal {
  public:
+  static const ::r_s_srlz::RenderSettings& render_settings(const TransportCatalogue* msg);
 };
 
+const ::r_s_srlz::RenderSettings&
+TransportCatalogue::_Internal::render_settings(const TransportCatalogue* msg) {
+  return *msg->_impl_.render_settings_;
+}
+void TransportCatalogue::clear_render_settings() {
+  if (GetArenaForAllocation() == nullptr && _impl_.render_settings_ != nullptr) {
+    delete _impl_.render_settings_;
+  }
+  _impl_.render_settings_ = nullptr;
+}
 TransportCatalogue::TransportCatalogue(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                          bool is_message_owned)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
@@ -1271,9 +1289,13 @@ TransportCatalogue::TransportCatalogue(const TransportCatalogue& from)
       decltype(_impl_.list_stop_){from._impl_.list_stop_}
     , decltype(_impl_.list_bus_){from._impl_.list_bus_}
     , decltype(_impl_.list_stop_lenght_){from._impl_.list_stop_lenght_}
+    , decltype(_impl_.render_settings_){nullptr}
     , /*decltype(_impl_._cached_size_)*/{}};
 
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  if (from._internal_has_render_settings()) {
+    _this->_impl_.render_settings_ = new ::r_s_srlz::RenderSettings(*from._impl_.render_settings_);
+  }
   // @@protoc_insertion_point(copy_constructor:t_c_srlz.TransportCatalogue)
 }
 
@@ -1285,6 +1307,7 @@ inline void TransportCatalogue::SharedCtor(
       decltype(_impl_.list_stop_){arena}
     , decltype(_impl_.list_bus_){arena}
     , decltype(_impl_.list_stop_lenght_){arena}
+    , decltype(_impl_.render_settings_){nullptr}
     , /*decltype(_impl_._cached_size_)*/{}
   };
 }
@@ -1303,6 +1326,7 @@ inline void TransportCatalogue::SharedDtor() {
   _impl_.list_stop_.~RepeatedPtrField();
   _impl_.list_bus_.~RepeatedPtrField();
   _impl_.list_stop_lenght_.~RepeatedPtrField();
+  if (this != internal_default_instance()) delete _impl_.render_settings_;
 }
 
 void TransportCatalogue::SetCachedSize(int size) const {
@@ -1318,6 +1342,10 @@ void TransportCatalogue::Clear() {
   _impl_.list_stop_.Clear();
   _impl_.list_bus_.Clear();
   _impl_.list_stop_lenght_.Clear();
+  if (GetArenaForAllocation() == nullptr && _impl_.render_settings_ != nullptr) {
+    delete _impl_.render_settings_;
+  }
+  _impl_.render_settings_ = nullptr;
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -1363,6 +1391,14 @@ const char* TransportCatalogue::_InternalParse(const char* ptr, ::_pbi::ParseCon
             CHK_(ptr);
             if (!ctx->DataAvailable(ptr)) break;
           } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<26>(ptr));
+        } else
+          goto handle_unusual;
+        continue;
+      // .r_s_srlz.RenderSettings render_settings = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 34)) {
+          ptr = ctx->ParseMessage(_internal_mutable_render_settings(), ptr);
+          CHK_(ptr);
         } else
           goto handle_unusual;
         continue;
@@ -1419,6 +1455,13 @@ uint8_t* TransportCatalogue::_InternalSerialize(
         InternalWriteMessage(3, repfield, repfield.GetCachedSize(), target, stream);
   }
 
+  // .r_s_srlz.RenderSettings render_settings = 4;
+  if (this->_internal_has_render_settings()) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(4, _Internal::render_settings(this),
+        _Internal::render_settings(this).GetCachedSize(), target, stream);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -1456,6 +1499,13 @@ size_t TransportCatalogue::ByteSizeLong() const {
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
   }
 
+  // .r_s_srlz.RenderSettings render_settings = 4;
+  if (this->_internal_has_render_settings()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+        *_impl_.render_settings_);
+  }
+
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
@@ -1477,6 +1527,10 @@ void TransportCatalogue::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, con
   _this->_impl_.list_stop_.MergeFrom(from._impl_.list_stop_);
   _this->_impl_.list_bus_.MergeFrom(from._impl_.list_bus_);
   _this->_impl_.list_stop_lenght_.MergeFrom(from._impl_.list_stop_lenght_);
+  if (from._internal_has_render_settings()) {
+    _this->_internal_mutable_render_settings()->::r_s_srlz::RenderSettings::MergeFrom(
+        from._internal_render_settings());
+  }
   _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
 
@@ -1497,6 +1551,7 @@ void TransportCatalogue::InternalSwap(TransportCatalogue* other) {
   _impl_.list_stop_.InternalSwap(&other->_impl_.list_stop_);
   _impl_.list_bus_.InternalSwap(&other->_impl_.list_bus_);
   _impl_.list_stop_lenght_.InternalSwap(&other->_impl_.list_stop_lenght_);
+  swap(_impl_.render_settings_, other->_impl_.render_settings_);
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata TransportCatalogue::GetMetadata() const {

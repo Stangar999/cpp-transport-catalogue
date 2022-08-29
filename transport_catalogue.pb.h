@@ -30,6 +30,7 @@
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
 #include <google/protobuf/unknown_field_set.h>
+#include "map_renderer.pb.h"
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 #define PROTOBUF_INTERNAL_EXPORT_transport_5fcatalogue_2eproto
@@ -909,6 +910,7 @@ class TransportCatalogue final :
     kListStopFieldNumber = 1,
     kListBusFieldNumber = 2,
     kListStopLenghtFieldNumber = 3,
+    kRenderSettingsFieldNumber = 4,
   };
   // repeated .t_c_srlz.Stop list_stop = 1;
   int list_stop_size() const;
@@ -964,6 +966,24 @@ class TransportCatalogue final :
   const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::t_c_srlz::StopsLenght >&
       list_stop_lenght() const;
 
+  // .r_s_srlz.RenderSettings render_settings = 4;
+  bool has_render_settings() const;
+  private:
+  bool _internal_has_render_settings() const;
+  public:
+  void clear_render_settings();
+  const ::r_s_srlz::RenderSettings& render_settings() const;
+  PROTOBUF_NODISCARD ::r_s_srlz::RenderSettings* release_render_settings();
+  ::r_s_srlz::RenderSettings* mutable_render_settings();
+  void set_allocated_render_settings(::r_s_srlz::RenderSettings* render_settings);
+  private:
+  const ::r_s_srlz::RenderSettings& _internal_render_settings() const;
+  ::r_s_srlz::RenderSettings* _internal_mutable_render_settings();
+  public:
+  void unsafe_arena_set_allocated_render_settings(
+      ::r_s_srlz::RenderSettings* render_settings);
+  ::r_s_srlz::RenderSettings* unsafe_arena_release_render_settings();
+
   // @@protoc_insertion_point(class_scope:t_c_srlz.TransportCatalogue)
  private:
   class _Internal;
@@ -975,6 +995,7 @@ class TransportCatalogue final :
     ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::t_c_srlz::Stop > list_stop_;
     ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::t_c_srlz::Bus > list_bus_;
     ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::t_c_srlz::StopsLenght > list_stop_lenght_;
+    ::r_s_srlz::RenderSettings* render_settings_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
   union { Impl_ _impl_; };
@@ -1590,6 +1611,91 @@ inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::t_c_srlz::StopsLenght 
 TransportCatalogue::list_stop_lenght() const {
   // @@protoc_insertion_point(field_list:t_c_srlz.TransportCatalogue.list_stop_lenght)
   return _impl_.list_stop_lenght_;
+}
+
+// .r_s_srlz.RenderSettings render_settings = 4;
+inline bool TransportCatalogue::_internal_has_render_settings() const {
+  return this != internal_default_instance() && _impl_.render_settings_ != nullptr;
+}
+inline bool TransportCatalogue::has_render_settings() const {
+  return _internal_has_render_settings();
+}
+inline const ::r_s_srlz::RenderSettings& TransportCatalogue::_internal_render_settings() const {
+  const ::r_s_srlz::RenderSettings* p = _impl_.render_settings_;
+  return p != nullptr ? *p : reinterpret_cast<const ::r_s_srlz::RenderSettings&>(
+      ::r_s_srlz::_RenderSettings_default_instance_);
+}
+inline const ::r_s_srlz::RenderSettings& TransportCatalogue::render_settings() const {
+  // @@protoc_insertion_point(field_get:t_c_srlz.TransportCatalogue.render_settings)
+  return _internal_render_settings();
+}
+inline void TransportCatalogue::unsafe_arena_set_allocated_render_settings(
+    ::r_s_srlz::RenderSettings* render_settings) {
+  if (GetArenaForAllocation() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.render_settings_);
+  }
+  _impl_.render_settings_ = render_settings;
+  if (render_settings) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:t_c_srlz.TransportCatalogue.render_settings)
+}
+inline ::r_s_srlz::RenderSettings* TransportCatalogue::release_render_settings() {
+  
+  ::r_s_srlz::RenderSettings* temp = _impl_.render_settings_;
+  _impl_.render_settings_ = nullptr;
+#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+  auto* old =  reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
+  temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  if (GetArenaForAllocation() == nullptr) { delete old; }
+#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
+  if (GetArenaForAllocation() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+  return temp;
+}
+inline ::r_s_srlz::RenderSettings* TransportCatalogue::unsafe_arena_release_render_settings() {
+  // @@protoc_insertion_point(field_release:t_c_srlz.TransportCatalogue.render_settings)
+  
+  ::r_s_srlz::RenderSettings* temp = _impl_.render_settings_;
+  _impl_.render_settings_ = nullptr;
+  return temp;
+}
+inline ::r_s_srlz::RenderSettings* TransportCatalogue::_internal_mutable_render_settings() {
+  
+  if (_impl_.render_settings_ == nullptr) {
+    auto* p = CreateMaybeMessage<::r_s_srlz::RenderSettings>(GetArenaForAllocation());
+    _impl_.render_settings_ = p;
+  }
+  return _impl_.render_settings_;
+}
+inline ::r_s_srlz::RenderSettings* TransportCatalogue::mutable_render_settings() {
+  ::r_s_srlz::RenderSettings* _msg = _internal_mutable_render_settings();
+  // @@protoc_insertion_point(field_mutable:t_c_srlz.TransportCatalogue.render_settings)
+  return _msg;
+}
+inline void TransportCatalogue::set_allocated_render_settings(::r_s_srlz::RenderSettings* render_settings) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.render_settings_);
+  }
+  if (render_settings) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+        ::PROTOBUF_NAMESPACE_ID::Arena::InternalGetOwningArena(
+                reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(render_settings));
+    if (message_arena != submessage_arena) {
+      render_settings = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, render_settings, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  _impl_.render_settings_ = render_settings;
+  // @@protoc_insertion_point(field_set_allocated:t_c_srlz.TransportCatalogue.render_settings)
 }
 
 #ifdef __GNUC__

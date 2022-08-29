@@ -9,34 +9,12 @@ namespace JsonReader
 JsonReader::JsonReader(TransportCatalogue::TransportCatalogue& db,
                        TransportRouter::TransportRouter& tr,
                        RequestHandler& req_hand,
-                       renderer::MapRenderer& renderer
-                       /*std::filesystem::path& path*/)
+                       renderer::MapRenderer& renderer)
     :db_(db)
     ,tr_(tr)
     ,req_hand_(req_hand)
     ,renderer_(renderer)
-//    ,path_(path)
 {
-//    using namespace domain;
-
-//    auto main_map = std::move(json::Load(in).GetRoot().AsDict());
-
-//    if(auto it = main_map.find(MainReq::base); it != main_map.end()){
-//        auto vec_map = std::move(it->second.AsArray());
-//        ParseRequestsBase(std::move(vec_map));
-//    }
-//    if(auto it = main_map.find(MainReq::render_settings); it != main_map.end()){
-//        auto map = std::move(it->second.AsDict());
-//        ParseRequestsRendSett(std::move(map));
-//    }
-//    if(auto it = main_map.find(MainReq::routing_settings); it != main_map.end()){
-//        auto map = std::move(it->second.AsDict());
-//        ParseRequestsRoutSett(std::move(map));
-//    }
-//    if(auto it = main_map.find(MainReq::stat); it != main_map.end()){
-//        auto vec_map = std::move(it->second.AsArray());
-//        ParseRequestsStat(vec_map);
-//    }
 
 }
 //----------------------------------------------------------------------------
@@ -85,14 +63,9 @@ void JsonReader::ParseJsonProcessRequests(std::istream& in)
 void JsonReader::ParseRequestsSrlz(const json::Dict&& req, std::string& path)
 {
     using namespace domain;
-//    try{
     if(req.find(MainReq::file) != req.end()){
         path = std::move(req.at(MainReq::file).AsString());
     }
-//    } catch(...) {
-//        std::cout << "ParseRequestsSrlz FAIL" << std::endl;
-//        throw;
-//    }
 }
 //----------------------------------------------------------------------------
 void JsonReader::ParseRequestsBase(json::Array&& vec_map)
@@ -233,7 +206,6 @@ void JsonReader::ParseRequestsRendSett(const json::Dict&& map)
           rnd_sett.color_palette.emplace_back(color);
       }
     }
-
     renderer_.SetRenderSettings(std::move(rnd_sett));
     renderer_.SetBuses(req_hand_.GetBusesLex());
     renderer_.SetUnicStops(req_hand_.GetUnicLexStopsIncludeBuses());
