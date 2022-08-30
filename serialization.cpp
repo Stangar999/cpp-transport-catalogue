@@ -6,35 +6,35 @@ Serialization::Serialization()
 
 }
 //----------------------------------------------------------------------------
-void Serialization::Serialize(const TransportCatalogue::TransportCatalogue& t_c
-                              , const renderer::MapRenderer& m_r
-                              , const TransportRouter::TransportRouter& t_r
+void Serialization::Serialize(const TransportCatalogue::TransportCatalogue& trnsprt_ctlg
+                              , const renderer::MapRenderer& map_rendr_
+                              , const TransportRouter::TransportRouter& trnsprt_routr_
                               , const std::filesystem::path& path) const
 {
-    t_c_srlz::TransportCatalogue s_t_c;
-    SerializeTC(s_t_c, t_c);
-    SerializeRS(s_t_c, m_r);
-    SerializeTR(s_t_c, t_r);
+    t_c_srlz::TransportCatalogue srlz_trnsprt_ctlg;
+    SerializeTrnsprtCtlg(srlz_trnsprt_ctlg, trnsprt_ctlg);
+    SerializeRendrSettng(srlz_trnsprt_ctlg, map_rendr_);
+    SerializeTrnsprtRoutr(srlz_trnsprt_ctlg, trnsprt_routr_);
     std::ofstream out(path, std::ios::binary);
-    s_t_c.SerializeToOstream(&out);
+    srlz_trnsprt_ctlg.SerializeToOstream(&out);
 }
 //----------------------------------------------------------------------------
 void Serialization::Deserialize(const std::filesystem::path& path
-                              , TransportCatalogue::TransportCatalogue& t_c
-                              , renderer::MapRenderer& m_r
-                              , TransportRouter::TransportRouter& t_r) const
+                              , TransportCatalogue::TransportCatalogue& trnsprt_ctlg
+                              , renderer::MapRenderer& map_rendr_
+                              , TransportRouter::TransportRouter& trnsprt_routr_) const
 {
     std::ifstream in(path, std::ios::binary);
-    t_c_srlz::TransportCatalogue s_t_c;
-    s_t_c.ParseFromIstream(&in);
-    DeserializeTC(s_t_c, t_c);
-    DeserializeRS(s_t_c, m_r);
-    DeserializeTR(s_t_c, t_r);
+    t_c_srlz::TransportCatalogue srlz_trnsprt_ctlg;
+    srlz_trnsprt_ctlg.ParseFromIstream(&in);
+    DeserializeTrnsprtCtlg(srlz_trnsprt_ctlg, trnsprt_ctlg);
+    DeserializeRendrSettng(srlz_trnsprt_ctlg, map_rendr_);
+    DeserializeTrnsprtRoutr(srlz_trnsprt_ctlg, trnsprt_routr_);
 }
 //----------------------------------------------------------------------------
-void Serialization::SerializeTC(t_c_srlz::TransportCatalogue& s_t_c, const TransportCatalogue::TransportCatalogue& t_c) const
+void Serialization::SerializeTrnsprtCtlg(t_c_srlz::TransportCatalogue& srlz_trnsprt_ctlg, const TransportCatalogue::TransportCatalogue& trnsprt_ctlg) const
 {
-    for(const auto& stop : t_c.GetStops()) {
+    for(const auto& stop : trnsprt_ctlg.GetStops()) {
         t_c_srlz::Stop s_stop;
         s_stop.set_name(stop.name);
 
@@ -44,9 +44,9 @@ void Serialization::SerializeTC(t_c_srlz::TransportCatalogue& s_t_c, const Trans
         *s_stop.mutable_coord() = std::move(s_coord);
 
         s_stop.set_id(stop.id);
-        *s_t_c.add_list_stop() = std::move(s_stop);
+        *srlz_trnsprt_ctlg.add_list_stop() = std::move(s_stop);
     }
-    for(const auto& bus : t_c.GetBuses()) {
+    for(const auto& bus : trnsprt_ctlg.GetBuses()) {
         t_c_srlz::Bus s_bus;
         s_bus.set_name(bus.name);
 
@@ -55,21 +55,21 @@ void Serialization::SerializeTC(t_c_srlz::TransportCatalogue& s_t_c, const Trans
         }
 
         s_bus.set_is_roundtrip(bus.is_round);
-        *s_t_c.add_list_bus() = std::move(s_bus);
+        *srlz_trnsprt_ctlg.add_list_bus() = std::move(s_bus);
     }
-    for(const auto& struc : t_c.GetIndexRageStop()) {
+    for(const auto& struc : trnsprt_ctlg.GetIndexRageStop()) {
         t_c_srlz::StopsLenght s_stop_lenght;
         s_stop_lenght.set_from_stop(struc.first.first->name);
         s_stop_lenght.set_to_stop(struc.first.second->name);
         s_stop_lenght.set_lenght(struc.second);
-        *s_t_c.add_list_stop_lenght() = std::move(s_stop_lenght);
+        *srlz_trnsprt_ctlg.add_list_stop_lenght() = std::move(s_stop_lenght);
     }
 }
 //----------------------------------------------------------------------------
-void Serialization::SerializeRS(t_c_srlz::TransportCatalogue& s_t_c, const renderer::MapRenderer& m_r) const
+void Serialization::SerializeRendrSettng(t_c_srlz::TransportCatalogue& srlz_trnsprt_ctlg, const renderer::MapRenderer& map_rendr_) const
 {
-    const renderer::RenderSettings& r_s = m_r.GetRenderSettings();
-    r_s_srlz::RenderSettings& s_r_s = *s_t_c.mutable_render_settings();
+    const renderer::RenderSettings& r_s = map_rendr_.GetRenderSettings();
+    r_s_srlz::RenderSettings& s_r_s = *srlz_trnsprt_ctlg.mutable_render_settings();
     s_r_s.set_width(r_s.width);
     s_r_s.set_height(r_s.height);
     s_r_s.set_padding(r_s.padding);
@@ -97,126 +97,119 @@ void Serialization::SerializeRS(t_c_srlz::TransportCatalogue& s_t_c, const rende
     }
 }
 //----------------------------------------------------------------------------
-void Serialization::SerializeTR(t_c_srlz::TransportCatalogue& s_t_c, const TransportRouter::TransportRouter& t_r) const
+void Serialization::SerializeTrnsprtRoutr(t_c_srlz::TransportCatalogue& srlz_trnsprt_ctlg, const TransportRouter::TransportRouter& trnsprt_routr_) const
 {
-    s_t_c.mutable_t_r_()->mutable_routing_settings()->set_bus_velocity(t_r.GetRoutingSettings().bus_velocity);
-    s_t_c.mutable_t_r_()->mutable_routing_settings()->set_bus_wait_time_minut(t_r.GetRoutingSettings().bus_wait_time_minut);
-    for(const auto& edge_bus : t_r.GetEdgesBuses() ) {
+    srlz_trnsprt_ctlg.mutable_t_r_()->mutable_routing_settings()->set_bus_velocity(trnsprt_routr_.GetRoutingSettings().bus_velocity);
+    srlz_trnsprt_ctlg.mutable_t_r_()->mutable_routing_settings()->set_bus_wait_time_minut(trnsprt_routr_.GetRoutingSettings().bus_wait_time_minut);
+    for(const auto& edge_bus : trnsprt_routr_.GetEdgesBuses() ) {
         t_r_srlz::EdgeAditionInfo edge_adition_info;
         edge_adition_info.set_bus_name(std::string(edge_bus.bus_name));
         edge_adition_info.set_count_spans(edge_bus.count_spans);
-        *s_t_c.mutable_t_r_()->add_edges_buses() = std::move(edge_adition_info);
+        *srlz_trnsprt_ctlg.mutable_t_r_()->add_edges_buses() = std::move(edge_adition_info);
     }
-    for(const auto& id_stop : t_r.GetIdStopes() ) {
-        *s_t_c.mutable_t_r_()->add_id_stopes() = id_stop;
+    for(const auto& id_stop : trnsprt_routr_.GetIdStopes() ) {
+        *srlz_trnsprt_ctlg.mutable_t_r_()->add_id_stopes() = id_stop;
     }
     // граф
-    s_t_c.mutable_t_r_()->mutable_graph()->set_vertex_count(t_r.GetGraph().GetVertexCount());
-    for(const auto& edge : t_r.GetGraph().GetEdges() ) {
+    srlz_trnsprt_ctlg.mutable_t_r_()->mutable_graph()->set_vertex_count(trnsprt_routr_.GetGraph().GetVertexCount());
+    for(const auto& edge : trnsprt_routr_.GetGraph().GetEdges() ) {
         t_r_srlz::Edge s_edge;
         s_edge.set_from(edge.from);
         s_edge.set_to(edge.to);
         s_edge.set_weight(edge.weight);
-        *s_t_c.mutable_t_r_()->mutable_graph()->add_edges() = std::move(s_edge);
+        *srlz_trnsprt_ctlg.mutable_t_r_()->mutable_graph()->add_edges() = std::move(s_edge);
     }
-//    for(const auto& incidence_list : t_r.GetGraph().GetIncidenceLists() ) {
-//        t_r_srlz::IncidenceList s_incidence_list;
-//        for(const auto& edge_id : incidence_list ) {
-//            s_incidence_list.add_edge_id(edge_id);
-//        }
-//        *s_t_c.mutable_t_r_()->mutable_graph()->add_incidence_lists() = std::move(s_incidence_list);
-//    }
 }
 //----------------------------------------------------------------------------
-void Serialization::DeserializeTC(const t_c_srlz::TransportCatalogue& s_t_c, TransportCatalogue::TransportCatalogue& t_c) const
+void Serialization::DeserializeTrnsprtCtlg(const t_c_srlz::TransportCatalogue& srlz_trnsprt_ctlg, TransportCatalogue::TransportCatalogue& trnsprt_ctlg) const
 {
-    size_t count_stop =  s_t_c.list_stop_size();
+    size_t count_stop =  srlz_trnsprt_ctlg.list_stop_size();
     for(size_t i = 0; i < count_stop; ++i) {
         domain::Stop stop;
-        stop.name = s_t_c.list_stop(i).name();
-        stop.coord.lat = s_t_c.list_stop(i).coord().latitude();
-        stop.coord.lng = s_t_c.list_stop(i).coord().longitude();
-        stop.id = s_t_c.list_stop(i).id();
-        t_c.AddStop(std::move(stop));
+        stop.name = srlz_trnsprt_ctlg.list_stop(i).name();
+        stop.coord.lat = srlz_trnsprt_ctlg.list_stop(i).coord().latitude();
+        stop.coord.lng = srlz_trnsprt_ctlg.list_stop(i).coord().longitude();
+        stop.id = srlz_trnsprt_ctlg.list_stop(i).id();
+        trnsprt_ctlg.AddStop(std::move(stop));
     }
 
-    size_t count_bus =  s_t_c.list_bus_size();
+    size_t count_bus =  srlz_trnsprt_ctlg.list_bus_size();
     for(size_t i = 0; i < count_bus; ++i) {
         domain::Bus bus;
-        bus.name = s_t_c.list_bus(i).name();
-        size_t count_name_stop =  s_t_c.list_bus(i).list_name_stop_size();
+        bus.name = srlz_trnsprt_ctlg.list_bus(i).name();
+        size_t count_name_stop =  srlz_trnsprt_ctlg.list_bus(i).list_name_stop_size();
         for(size_t j = 0; j < count_name_stop; ++j) {
-            bus.stops.push_back(t_c.FindStop(s_t_c.list_bus(i).list_name_stop(j)).value());
+            bus.stops.push_back(trnsprt_ctlg.FindStop(srlz_trnsprt_ctlg.list_bus(i).list_name_stop(j)).value());
         }
-        bus.is_round = s_t_c.list_bus(i).is_roundtrip();
-        t_c.AddBus(std::move(bus));
+        bus.is_round = srlz_trnsprt_ctlg.list_bus(i).is_roundtrip();
+        trnsprt_ctlg.AddBus(std::move(bus));
     }
 
-    size_t count_ranges =  s_t_c.list_stop_lenght_size();
+    size_t count_ranges =  srlz_trnsprt_ctlg.list_stop_lenght_size();
     for(size_t i = 0; i < count_ranges; ++i) {
         domain::StopsLenght stop_lenght;
-        stop_lenght.from_stop = s_t_c.list_stop_lenght(i).from_stop();
-        stop_lenght.to_stop = s_t_c.list_stop_lenght(i).to_stop();
-        stop_lenght.lenght = s_t_c.list_stop_lenght(i).lenght();
-        t_c.AddRangeStops(std::move(stop_lenght));
+        stop_lenght.from_stop = srlz_trnsprt_ctlg.list_stop_lenght(i).from_stop();
+        stop_lenght.to_stop = srlz_trnsprt_ctlg.list_stop_lenght(i).to_stop();
+        stop_lenght.lenght = srlz_trnsprt_ctlg.list_stop_lenght(i).lenght();
+        trnsprt_ctlg.AddRangeStops(std::move(stop_lenght));
     }
 }
 //----------------------------------------------------------------------------
-void Serialization::DeserializeRS(const t_c_srlz::TransportCatalogue& s_t_c, renderer::MapRenderer& m_r) const
+void Serialization::DeserializeRendrSettng(const t_c_srlz::TransportCatalogue& srlz_trnsprt_ctlg, renderer::MapRenderer& map_rendr_) const
 {
     renderer::RenderSettings render_settings;
-    render_settings.width = s_t_c.render_settings().width();
-    render_settings.height = s_t_c.render_settings().height();
-    render_settings.padding = s_t_c.render_settings().padding();
-    render_settings.line_width = s_t_c.render_settings().line_width();
-    render_settings.stop_radius = s_t_c.render_settings().stop_radius();
-    render_settings.bus_label_font_size = s_t_c.render_settings().bus_label_font_size();
-    render_settings.bus_label_offset = {s_t_c.render_settings().bus_label_offset().x()
-                                       ,s_t_c.render_settings().bus_label_offset().y()};
-    render_settings.stop_label_font_size = s_t_c.render_settings().stop_label_font_size();
-    render_settings.stop_label_offset = {s_t_c.render_settings().stop_label_offset().x()
-                                         ,s_t_c.render_settings().stop_label_offset().y()};
-    render_settings.underlayer_color = GetCurrentVariantColor(s_t_c.render_settings().underlayer_color());
-    render_settings.underlayer_width = s_t_c.render_settings().underlayer_width();
+    render_settings.width = srlz_trnsprt_ctlg.render_settings().width();
+    render_settings.height = srlz_trnsprt_ctlg.render_settings().height();
+    render_settings.padding = srlz_trnsprt_ctlg.render_settings().padding();
+    render_settings.line_width = srlz_trnsprt_ctlg.render_settings().line_width();
+    render_settings.stop_radius = srlz_trnsprt_ctlg.render_settings().stop_radius();
+    render_settings.bus_label_font_size = srlz_trnsprt_ctlg.render_settings().bus_label_font_size();
+    render_settings.bus_label_offset = {srlz_trnsprt_ctlg.render_settings().bus_label_offset().x()
+                                       ,srlz_trnsprt_ctlg.render_settings().bus_label_offset().y()};
+    render_settings.stop_label_font_size = srlz_trnsprt_ctlg.render_settings().stop_label_font_size();
+    render_settings.stop_label_offset = {srlz_trnsprt_ctlg.render_settings().stop_label_offset().x()
+                                         ,srlz_trnsprt_ctlg.render_settings().stop_label_offset().y()};
+    render_settings.underlayer_color = GetCurrentVariantColor(srlz_trnsprt_ctlg.render_settings().underlayer_color());
+    render_settings.underlayer_width = srlz_trnsprt_ctlg.render_settings().underlayer_width();
     bool is_clear = false;
-    for(int i = 0; i < s_t_c.render_settings().color_palette_size(); ++i) {
+    for(int i = 0; i < srlz_trnsprt_ctlg.render_settings().color_palette_size(); ++i) {
         if(! is_clear) {
             render_settings.color_palette.clear(); // очистка значений по умолчанию
             is_clear =true;
         }
-        render_settings.color_palette.emplace_back(GetCurrentVariantColor(s_t_c.render_settings().color_palette(i)));
+        render_settings.color_palette.emplace_back(GetCurrentVariantColor(srlz_trnsprt_ctlg.render_settings().color_palette(i)));
     }
-    m_r.SetRenderSettings(std::move(render_settings));
+    map_rendr_.SetRenderSettings(std::move(render_settings));
 
 }
 //----------------------------------------------------------------------------
-void Serialization::DeserializeTR(const t_c_srlz::TransportCatalogue& s_t_c, TransportRouter::TransportRouter& t_r) const
+void Serialization::DeserializeTrnsprtRoutr(const t_c_srlz::TransportCatalogue& srlz_trnsprt_ctlg, TransportRouter::TransportRouter& trnsprt_routr_) const
 {
-    t_r.SetRoutingSettings( {.bus_wait_time_minut = s_t_c.t_r_().routing_settings().bus_wait_time_minut(),
-                             .bus_velocity = s_t_c.t_r_().routing_settings().bus_velocity()} );
+    trnsprt_routr_.SetRoutingSettings( {.bus_wait_time_minut = srlz_trnsprt_ctlg.trnsprt_routr_().routing_settings().bus_wait_time_minut(),
+                             .bus_velocity = srlz_trnsprt_ctlg.trnsprt_routr_().routing_settings().bus_velocity()} );
 
-    std::vector<TransportRouter::TransportRouter::EdgeAditionInfo> edges_buses(s_t_c.t_r_().edges_buses_size());
-    for (int i = 0; i < s_t_c.t_r_().edges_buses_size(); ++i) {
-        edges_buses[i].bus_name = s_t_c.t_r_().edges_buses(i).bus_name();
-        edges_buses[i].count_spans = s_t_c.t_r_().edges_buses(i).count_spans();
+    std::vector<TransportRouter::TransportRouter::EdgeAditionInfo> edges_buses(srlz_trnsprt_ctlg.trnsprt_routr_().edges_buses_size());
+    for (int i = 0; i < srlz_trnsprt_ctlg.trnsprt_routr_().edges_buses_size(); ++i) {
+        edges_buses[i].bus_name = srlz_trnsprt_ctlg.trnsprt_routr_().edges_buses(i).bus_name();
+        edges_buses[i].count_spans = srlz_trnsprt_ctlg.trnsprt_routr_().edges_buses(i).count_spans();
     }
-    t_r.SetEdgesBuses(std::move(edges_buses));
+    trnsprt_routr_.SetEdgesBuses(std::move(edges_buses));
 
-    std::vector<std::string> id_stopes(s_t_c.t_r_().id_stopes_size());
-    for (int i = 0; i < s_t_c.t_r_().id_stopes_size(); ++i) {
-        id_stopes[i] = s_t_c.t_r_().id_stopes(i);
+    std::vector<std::string> id_stopes(srlz_trnsprt_ctlg.trnsprt_routr_().id_stopes_size());
+    for (int i = 0; i < srlz_trnsprt_ctlg.trnsprt_routr_().id_stopes_size(); ++i) {
+        id_stopes[i] = srlz_trnsprt_ctlg.trnsprt_routr_().id_stopes(i);
     }
-    t_r.SetIdStopes(std::move(id_stopes));
+    trnsprt_routr_.SetIdStopes(std::move(id_stopes));
 
-    graph::DirectedWeightedGraph<double> graph(s_t_c.t_r_().graph().vertex_count());
-    for (int i = 0; i < s_t_c.t_r_().graph().edges_size(); ++i) {
+    graph::DirectedWeightedGraph<double> graph(srlz_trnsprt_ctlg.trnsprt_routr_().graph().vertex_count());
+    for (int i = 0; i < srlz_trnsprt_ctlg.trnsprt_routr_().graph().edges_size(); ++i) {
         graph::Edge<double> edge;
-        edge.from = s_t_c.t_r_().graph().edges(i).from();
-        edge.to = s_t_c.t_r_().graph().edges(i).to();
-        edge.weight = s_t_c.t_r_().graph().edges(i).weight();
+        edge.from = srlz_trnsprt_ctlg.trnsprt_routr_().graph().edges(i).from();
+        edge.to = srlz_trnsprt_ctlg.trnsprt_routr_().graph().edges(i).to();
+        edge.weight = srlz_trnsprt_ctlg.trnsprt_routr_().graph().edges(i).weight();
         graph.AddEdge(std::move(edge));
     }
-    t_r.SetGraph(std::move(graph));
+    trnsprt_routr_.SetGraph(std::move(graph));
 }
 //----------------------------------------------------------------------------
 r_s_srlz::Color Serialization::GetCurrentVariantSrlzColor(const svg::Color& color) const {

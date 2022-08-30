@@ -9,10 +9,6 @@
 #include "request_handler.h"
 #include "map_renderer.h"
 
-/*
- * Здесь можно разместить код наполнения транспортного справочника данными из JSON,
- * а также код обработки запросов к базе и формирование массива ответов в формате JSON
-*/
 namespace JsonReader
 {
 using namespace std::literals;
@@ -20,10 +16,10 @@ using namespace std::literals;
 class JsonReader
 {
 public:
-    JsonReader(TransportCatalogue::TransportCatalogue& t_c,
-               TransportRouter::TransportRouter& tr,
+    JsonReader(TransportCatalogue::TransportCatalogue& trnsprt_ctlg,
+               TransportRouter::TransportRouter& trnsprt_routr,
                RequestHandler& req_hand,
-               renderer::MapRenderer& renderer);
+               renderer::MapRenderer& map_rendr);
 
     /** обработка .json с вводными данными из которых сформируется БД */
     void ParseJsonMakeBase(std::istream& in);
@@ -58,13 +54,13 @@ private:
 
     json::Dict PrintResReqRoute(std::optional<domain::RoutStat>&& rout_stat_opt, int id);
 
-    TransportCatalogue::TransportCatalogue& t_c_;
+    TransportCatalogue::TransportCatalogue& trnsprt_ctlg_;
 
-    TransportRouter::TransportRouter& t_r_;
+    TransportRouter::TransportRouter& trnsprt_routr_;
 
     RequestHandler& req_hand_;
 
-    renderer::MapRenderer& m_r_;
+    renderer::MapRenderer& map_rendr_;
 };
 
 

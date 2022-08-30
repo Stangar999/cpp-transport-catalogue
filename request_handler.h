@@ -7,29 +7,13 @@
 #include "map_renderer.h"
 #include "transport_router.h"
 
-/*
- * Здесь можно было бы разместить код обработчика запросов к базе, содержащего логику, которую не
- * хотелось бы помещать ни в transport_catalogue, ни в json reader.
- *
- * В качестве источника для идей предлагаем взглянуть на нашу версию обработчика запросов.
- * Вы можете реализовать обработку запросов способом, который удобнее вам.
- *
- * Если вы затрудняетесь выбрать, что можно было бы поместить в этот файл,
- * можете оставить его пустым.
- */
-
-// Класс RequestHandler играет роль Фасада, упрощающего взаимодействие JSON reader-а
-// с другими подсистемами приложения.
-// См. паттерн проектирования Фасад: https://ru.wikipedia.org/wiki/Фасад_(шаблон_проектирования)
-//using namespace TransportCatalogue;
-
 class RequestHandler {
 
 public:
     // MapRenderer понадобится в следующей части итогового проекта
-    RequestHandler(TransportCatalogue::TransportCatalogue& t_c,
-                   TransportRouter::TransportRouter& t_r,
-                   renderer::MapRenderer& m_r);
+    RequestHandler(TransportCatalogue::TransportCatalogue& trnsprt_ctlg,
+                   TransportRouter::TransportRouter& trnsprt_routr_,
+                   renderer::MapRenderer& map_rendr_);
 
     // Возвращает информацию о маршруте (запрос Bus)
     std::optional<domain::BusStat> GetBusStat(const std::string_view& bus_name) const;
@@ -51,13 +35,12 @@ public:
 
     void CallSrlz(const std::filesystem::path& path) const;
 
-    // если я правильно понял о каком методе идет речь, то он уже есть строка 37
 private:
     domain::BusStat CreateBusStat (const domain::Bus* bus) const;
 
-    TransportCatalogue::TransportCatalogue& t_c_;
+    TransportCatalogue::TransportCatalogue& trnsprt_ctlg_;
 
-    TransportRouter::TransportRouter& t_r_;
+    TransportRouter::TransportRouter& trnsprt_routr_;
 
-    renderer::MapRenderer& m_r_;
+    renderer::MapRenderer& map_rendr_;
 };

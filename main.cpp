@@ -20,29 +20,25 @@ int main(int argc, char* argv[]) {
         PrintUsage();
         return 1;
     }
-
     const std::string_view mode(argv[1]);
-// make_base
-    if (mode == "1"sv) {
+    if (mode == "make_base"sv) {
         TransportCatalogue::TransportCatalogue db;
-        TransportRouter::TransportRouter tr;
+        TransportRouter::TransportRouter trnsprt_routr;
         renderer::MapRenderer rend;
-        RequestHandler req_hand(db, tr, rend);
-        JsonReader::JsonReader j_r(db, tr, req_hand, rend);
+        RequestHandler req_hand(db, trnsprt_routr, rend);
+        JsonReader::JsonReader j_r(db, trnsprt_routr, req_hand, rend);
         j_r.ParseJsonMakeBase(cin);
-// process_requests
-    } else if (mode == "2"sv) {
+    } else if (mode == "process_requests"sv) {
         TransportCatalogue::TransportCatalogue db;
-        TransportRouter::TransportRouter tr;
+        TransportRouter::TransportRouter trnsprt_routr;
         renderer::MapRenderer rend;
-        RequestHandler req_hand(db, tr, rend);
-        JsonReader::JsonReader j_r(db, tr, req_hand, rend);
+        RequestHandler req_hand(db, trnsprt_routr, rend);
+        JsonReader::JsonReader j_r(db, trnsprt_routr, req_hand, rend);
         j_r.ParseJsonProcessRequests(cin);
     } else {
         PrintUsage();
         return 1;
     }
-//    cout << endl << "ok" << endl;
 }
 
 

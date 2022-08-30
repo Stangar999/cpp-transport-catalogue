@@ -9,24 +9,24 @@
 class Serialization {
 public:
     Serialization();
-    void Serialize(const TransportCatalogue::TransportCatalogue& t_c
-                   , const renderer::MapRenderer& m_r
-                   , const TransportRouter::TransportRouter& t_r
+    void Serialize(const TransportCatalogue::TransportCatalogue& trnsprt_ctlg
+                   , const renderer::MapRenderer& map_rendr_
+                   , const TransportRouter::TransportRouter& trnsprt_routr_
                    , const std::filesystem::path& path) const;
 
     void Deserialize(const std::filesystem::path& path
-                     , TransportCatalogue::TransportCatalogue& t_c
-                     , renderer::MapRenderer& m_r
-                     , TransportRouter::TransportRouter& t_r) const;
+                     , TransportCatalogue::TransportCatalogue& trnsprt_ctlg
+                     , renderer::MapRenderer& map_rendr_
+                     , TransportRouter::TransportRouter& trnsprt_routr_) const;
 
 private:
-    void SerializeTC(t_c_srlz::TransportCatalogue& s_t_c, const TransportCatalogue::TransportCatalogue& t_c) const;
-    void SerializeRS(t_c_srlz::TransportCatalogue& s_t_c, const renderer::MapRenderer& m_r) const;
-    void SerializeTR(t_c_srlz::TransportCatalogue& s_t_c, const TransportRouter::TransportRouter& t_r) const;
+    void SerializeTrnsprtCtlg(t_c_srlz::TransportCatalogue& srlz_trnsprt_ctlg, const TransportCatalogue::TransportCatalogue& trnsprt_ctlg) const;
+    void SerializeRendrSettng(t_c_srlz::TransportCatalogue& srlz_trnsprt_ctlg, const renderer::MapRenderer& map_rendr_) const;
+    void SerializeTrnsprtRoutr(t_c_srlz::TransportCatalogue& srlz_trnsprt_ctlg, const TransportRouter::TransportRouter& trnsprt_routr_) const;
 
-    void DeserializeTC(const t_c_srlz::TransportCatalogue& s_t_c, TransportCatalogue::TransportCatalogue& t_c) const;
-    void DeserializeRS(const t_c_srlz::TransportCatalogue& s_t_c, renderer::MapRenderer& m_r) const;
-    void DeserializeTR(const t_c_srlz::TransportCatalogue& s_t_c, TransportRouter::TransportRouter& t_r) const;
+    void DeserializeTrnsprtCtlg(const t_c_srlz::TransportCatalogue& srlz_trnsprt_ctlg, TransportCatalogue::TransportCatalogue& trnsprt_ctlg) const;
+    void DeserializeRendrSettng(const t_c_srlz::TransportCatalogue& srlz_trnsprt_ctlg, renderer::MapRenderer& map_rendr_) const;
+    void DeserializeTrnsprtRoutr(const t_c_srlz::TransportCatalogue& srlz_trnsprt_ctlg, TransportRouter::TransportRouter& trnsprt_routr_) const;
 
     r_s_srlz::Color GetCurrentVariantSrlzColor(const svg::Color& color) const;
     svg::Color GetCurrentVariantColor(const r_s_srlz::Color& s_color) const;

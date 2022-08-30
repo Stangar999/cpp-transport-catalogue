@@ -80,10 +80,4 @@ template <typename Weight>
 const std::vector<Edge<Weight>>& DirectedWeightedGraph<Weight>::GetEdges() const {
     return edges_;
 }
-
-//template <typename Weight>
-//const std::vector<typename DirectedWeightedGraph<Weight>::IncidenceList>&
-//DirectedWeightedGraph<Weight>::GetIncidenceLists() const {
-//    return incidence_lists_;
-//}
 }  // namespace graph

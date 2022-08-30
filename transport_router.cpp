@@ -55,12 +55,12 @@ bool TransportRouter::GetGraphIsNoInit() const {
     return ! opt_graph_.has_value();
 }
 //----------------------------------------------------------------------------
-void TransportRouter::vInit(RoutingSettings routing_settings_, const TransportCatalogue::TransportCatalogue& t_c)
+void TransportRouter::vInit(RoutingSettings routing_settings_, const TransportCatalogue::TransportCatalogue& trnsprt_ctlg)
 {
     SetRoutingSettings(std::move(routing_settings_));
     // создаем граф и маршрутизатор
     if(GetGraphIsNoInit()) {
-        CreateGraph(t_c);
+        CreateGraph(trnsprt_ctlg);
     }
 }
 //----------------------------------------------------------------------------

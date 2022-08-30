@@ -34,7 +34,7 @@ public:
     // Граф не создан
     bool GetGraphIsNoInit() const;
 
-    void vInit(RoutingSettings routing_settings_, const TransportCatalogue::TransportCatalogue& t_c);
+    void vInit(RoutingSettings routing_settings_, const TransportCatalogue::TransportCatalogue& trnsprt_ctlg);
 
     const std::vector<EdgeAditionInfo>& GetEdgesBuses() const;
 

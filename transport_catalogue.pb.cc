@@ -1269,7 +1269,7 @@ void StopsLenght::InternalSwap(StopsLenght* other) {
 class TransportCatalogue::_Internal {
  public:
   static const ::r_s_srlz::RenderSettings& render_settings(const TransportCatalogue* msg);
-  static const ::t_r_srlz::TransportRouter& t_r_(const TransportCatalogue* msg);
+  static const ::t_r_srlz::TransportRouter& trnsprt_routr_(const TransportCatalogue* msg);
 };
 
 const ::r_s_srlz::RenderSettings&
@@ -1277,7 +1277,7 @@ TransportCatalogue::_Internal::render_settings(const TransportCatalogue* msg) {
   return *msg->_impl_.render_settings_;
 }
 const ::t_r_srlz::TransportRouter&
-TransportCatalogue::_Internal::t_r_(const TransportCatalogue* msg) {
+TransportCatalogue::_Internal::trnsprt_routr_(const TransportCatalogue* msg) {
   return *msg->_impl_.t_r__;
 }
 void TransportCatalogue::clear_render_settings() {
@@ -1428,7 +1428,7 @@ const char* TransportCatalogue::_InternalParse(const char* ptr, ::_pbi::ParseCon
         } else
           goto handle_unusual;
         continue;
-      // .t_r_srlz.TransportRouter t_r_ = 5;
+      // .t_r_srlz.TransportRouter trnsprt_routr_ = 5;
       case 5:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 42)) {
           ptr = ctx->ParseMessage(_internal_mutable_t_r_(), ptr);
@@ -1496,11 +1496,11 @@ uint8_t* TransportCatalogue::_InternalSerialize(
         _Internal::render_settings(this).GetCachedSize(), target, stream);
   }
 
-  // .t_r_srlz.TransportRouter t_r_ = 5;
+  // .t_r_srlz.TransportRouter trnsprt_routr_ = 5;
   if (this->_internal_has_t_r_()) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(5, _Internal::t_r_(this),
-        _Internal::t_r_(this).GetCachedSize(), target, stream);
+      InternalWriteMessage(5, _Internal::trnsprt_routr_(this),
+        _Internal::trnsprt_routr_(this).GetCachedSize(), target, stream);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -1547,7 +1547,7 @@ size_t TransportCatalogue::ByteSizeLong() const {
         *_impl_.render_settings_);
   }
 
-  // .t_r_srlz.TransportRouter t_r_ = 5;
+  // .t_r_srlz.TransportRouter trnsprt_routr_ = 5;
   if (this->_internal_has_t_r_()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(

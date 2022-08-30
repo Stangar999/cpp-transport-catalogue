@@ -986,22 +986,22 @@ class TransportCatalogue final :
       ::r_s_srlz::RenderSettings* render_settings);
   ::r_s_srlz::RenderSettings* unsafe_arena_release_render_settings();
 
-  // .t_r_srlz.TransportRouter t_r_ = 5;
+  // .t_r_srlz.TransportRouter trnsprt_routr_ = 5;
   bool has_t_r_() const;
   private:
   bool _internal_has_t_r_() const;
   public:
   void clear_t_r_();
-  const ::t_r_srlz::TransportRouter& t_r_() const;
+  const ::t_r_srlz::TransportRouter& trnsprt_routr_() const;
   PROTOBUF_NODISCARD ::t_r_srlz::TransportRouter* release_t_r_();
   ::t_r_srlz::TransportRouter* mutable_t_r_();
-  void set_allocated_t_r_(::t_r_srlz::TransportRouter* t_r_);
+  void set_allocated_t_r_(::t_r_srlz::TransportRouter* trnsprt_routr_);
   private:
   const ::t_r_srlz::TransportRouter& _internal_t_r_() const;
   ::t_r_srlz::TransportRouter* _internal_mutable_t_r_();
   public:
   void unsafe_arena_set_allocated_t_r_(
-      ::t_r_srlz::TransportRouter* t_r_);
+      ::t_r_srlz::TransportRouter* trnsprt_routr_);
   ::t_r_srlz::TransportRouter* unsafe_arena_release_t_r_();
 
   // @@protoc_insertion_point(class_scope:t_c_srlz.TransportCatalogue)
@@ -1719,7 +1719,7 @@ inline void TransportCatalogue::set_allocated_render_settings(::r_s_srlz::Render
   // @@protoc_insertion_point(field_set_allocated:t_c_srlz.TransportCatalogue.render_settings)
 }
 
-// .t_r_srlz.TransportRouter t_r_ = 5;
+// .t_r_srlz.TransportRouter trnsprt_routr_ = 5;
 inline bool TransportCatalogue::_internal_has_t_r_() const {
   return this != internal_default_instance() && _impl_.t_r__ != nullptr;
 }
@@ -1731,22 +1731,22 @@ inline const ::t_r_srlz::TransportRouter& TransportCatalogue::_internal_t_r_() c
   return p != nullptr ? *p : reinterpret_cast<const ::t_r_srlz::TransportRouter&>(
       ::t_r_srlz::_TransportRouter_default_instance_);
 }
-inline const ::t_r_srlz::TransportRouter& TransportCatalogue::t_r_() const {
-  // @@protoc_insertion_point(field_get:t_c_srlz.TransportCatalogue.t_r_)
+inline const ::t_r_srlz::TransportRouter& TransportCatalogue::trnsprt_routr_() const {
+  // @@protoc_insertion_point(field_get:t_c_srlz.TransportCatalogue.trnsprt_routr_)
   return _internal_t_r_();
 }
 inline void TransportCatalogue::unsafe_arena_set_allocated_t_r_(
-    ::t_r_srlz::TransportRouter* t_r_) {
+    ::t_r_srlz::TransportRouter* trnsprt_routr_) {
   if (GetArenaForAllocation() == nullptr) {
     delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.t_r__);
   }
-  _impl_.t_r__ = t_r_;
-  if (t_r_) {
+  _impl_.t_r__ = trnsprt_routr_;
+  if (trnsprt_routr_) {
     
   } else {
     
   }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:t_c_srlz.TransportCatalogue.t_r_)
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:t_c_srlz.TransportCatalogue.trnsprt_routr_)
 }
 inline ::t_r_srlz::TransportRouter* TransportCatalogue::release_t_r_() {
   
@@ -1764,7 +1764,7 @@ inline ::t_r_srlz::TransportRouter* TransportCatalogue::release_t_r_() {
   return temp;
 }
 inline ::t_r_srlz::TransportRouter* TransportCatalogue::unsafe_arena_release_t_r_() {
-  // @@protoc_insertion_point(field_release:t_c_srlz.TransportCatalogue.t_r_)
+  // @@protoc_insertion_point(field_release:t_c_srlz.TransportCatalogue.trnsprt_routr_)
   
   ::t_r_srlz::TransportRouter* temp = _impl_.t_r__;
   _impl_.t_r__ = nullptr;
@@ -1780,28 +1780,28 @@ inline ::t_r_srlz::TransportRouter* TransportCatalogue::_internal_mutable_t_r_()
 }
 inline ::t_r_srlz::TransportRouter* TransportCatalogue::mutable_t_r_() {
   ::t_r_srlz::TransportRouter* _msg = _internal_mutable_t_r_();
-  // @@protoc_insertion_point(field_mutable:t_c_srlz.TransportCatalogue.t_r_)
+  // @@protoc_insertion_point(field_mutable:t_c_srlz.TransportCatalogue.trnsprt_routr_)
   return _msg;
 }
-inline void TransportCatalogue::set_allocated_t_r_(::t_r_srlz::TransportRouter* t_r_) {
+inline void TransportCatalogue::set_allocated_t_r_(::t_r_srlz::TransportRouter* trnsprt_routr_) {
   ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
   if (message_arena == nullptr) {
     delete reinterpret_cast< ::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.t_r__);
   }
-  if (t_r_) {
+  if (trnsprt_routr_) {
     ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
         ::PROTOBUF_NAMESPACE_ID::Arena::InternalGetOwningArena(
-                reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(t_r_));
+                reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(trnsprt_routr_));
     if (message_arena != submessage_arena) {
-      t_r_ = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
-          message_arena, t_r_, submessage_arena);
+      trnsprt_routr_ = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, trnsprt_routr_, submessage_arena);
     }
     
   } else {
     
   }
-  _impl_.t_r__ = t_r_;
-  // @@protoc_insertion_point(field_set_allocated:t_c_srlz.TransportCatalogue.t_r_)
+  _impl_.t_r__ = trnsprt_routr_;
+  // @@protoc_insertion_point(field_set_allocated:t_c_srlz.TransportCatalogue.trnsprt_routr_)
 }
 
 #ifdef __GNUC__
