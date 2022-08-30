@@ -27,9 +27,9 @@ class RequestHandler {
 
 public:
     // MapRenderer понадобится в следующей части итогового проекта
-    RequestHandler(TransportCatalogue::TransportCatalogue& db,
-                   TransportRouter::TransportRouter& tr,
-                   renderer::MapRenderer& renderer);
+    RequestHandler(TransportCatalogue::TransportCatalogue& t_c,
+                   TransportRouter::TransportRouter& t_r,
+                   renderer::MapRenderer& m_r);
 
     // Возвращает информацию о маршруте (запрос Bus)
     std::optional<domain::BusStat> GetBusStat(const std::string_view& bus_name) const;
@@ -57,7 +57,7 @@ private:
 
     TransportCatalogue::TransportCatalogue& t_c_;
 
-    TransportRouter::TransportRouter& tr_;
+    TransportRouter::TransportRouter& t_r_;
 
     renderer::MapRenderer& m_r_;
 };

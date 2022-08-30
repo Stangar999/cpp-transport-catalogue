@@ -20,7 +20,7 @@ using namespace std::literals;
 class JsonReader
 {
 public:
-    JsonReader(TransportCatalogue::TransportCatalogue& db,
+    JsonReader(TransportCatalogue::TransportCatalogue& t_c,
                TransportRouter::TransportRouter& tr,
                RequestHandler& req_hand,
                renderer::MapRenderer& renderer);
@@ -58,13 +58,13 @@ private:
 
     json::Dict PrintResReqRoute(std::optional<domain::RoutStat>&& rout_stat_opt, int id);
 
-    TransportCatalogue::TransportCatalogue& db_;
+    TransportCatalogue::TransportCatalogue& t_c_;
 
-    TransportRouter::TransportRouter& tr_;
+    TransportRouter::TransportRouter& t_r_;
 
     RequestHandler& req_hand_;
 
-    renderer::MapRenderer& renderer_;
+    renderer::MapRenderer& m_r_;
 };
 
 

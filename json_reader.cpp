@@ -6,14 +6,14 @@
 namespace JsonReader
 {
 //----------------------------------------------------------------------------
-JsonReader::JsonReader(TransportCatalogue::TransportCatalogue& db,
+JsonReader::JsonReader(TransportCatalogue::TransportCatalogue& t_c,
                        TransportRouter::TransportRouter& tr,
                        RequestHandler& req_hand,
                        renderer::MapRenderer& renderer)
-    :db_(db)
-    ,tr_(tr)
+    :t_c_(t_c)
+    ,t_r_(tr)
     ,req_hand_(req_hand)
-    ,renderer_(renderer)
+    ,m_r_(renderer)
 {
 
 }
@@ -79,10 +79,10 @@ void JsonReader::ParseRequestsBase(json::Array&& vec_map)
 
     for(const auto& map_type_data : vec_map){
         if(const auto& map_type_stop = map_type_data.AsDict(); map_type_stop.at(MainReq::type).AsString() == MainReq::stop){
-            db_.AddStop(ParseRequestsStops(map_type_stop));
+            t_c_.AddStop(ParseRequestsStops(map_type_stop));
         } else {
             auto bus = ParseRequestsBuses(map_type_data.AsDict());
-            db_.AddBus(bus);
+            t_c_.AddBus(bus);
         }
     }
 
@@ -206,9 +206,9 @@ void JsonReader::ParseRequestsRendSett(const json::Dict&& map)
           rnd_sett.color_palette.emplace_back(color);
       }
     }
-    renderer_.SetRenderSettings(std::move(rnd_sett));
-    renderer_.SetBuses(req_hand_.GetBusesLex());
-    renderer_.SetUnicStops(req_hand_.GetUnicLexStopsIncludeBuses());
+    m_r_.SetRenderSettings(std::move(rnd_sett));
+    m_r_.SetBuses(req_hand_.GetBusesLex());
+    m_r_.SetUnicStops(req_hand_.GetUnicLexStopsIncludeBuses());
 }
 //----------------------------------------------------------------------------
 void JsonReader::ParseRequestsRoutSett(const json::Dict&& req)
@@ -223,7 +223,7 @@ void JsonReader::ParseRequestsRoutSett(const json::Dict&& req)
         if(req.find(bus_velocity) != req.end()){
             rout_set.bus_velocity = req.at(bus_velocity).AsDouble();
         }
-        tr_.settings_ = std::move(rout_set);
+        t_r_.vInit(std::move(rout_set), t_c_);
     } catch(...) {
         std::cout << "ParseRequestsRoutSett FAIL" << std::endl;
         throw;
@@ -250,7 +250,7 @@ domain::Bus JsonReader::ParseRequestsBuses(const json::Dict& req)
             for(const auto& stop_name : req.at(MainReq::stops).AsArray()){
                 const auto& str_stop_name = stop_name.AsString();
                 try {
-                    stops.push_back(db_.FindStop(str_stop_name).value());
+                    stops.push_back(t_c_.FindStop(str_stop_name).value());
                 } catch (...) {
                     std::cout << "tc_.FindStop(name_stop).value()";
                 }
@@ -282,7 +282,7 @@ void JsonReader::ParseRequestsStopsLenght(const json::Dict& req)
     std::string range;
     try{
         for(const auto& rd : req.at(MainReq::road_distances).AsDict()){
-            db_.AddRangeStops( {std::move(name_from_stop), rd.first, static_cast<size_t>(rd.second.AsInt())} );
+            t_c_.AddRangeStops( {std::move(name_from_stop), rd.first, static_cast<size_t>(rd.second.AsInt())} );
         }
     } catch(...) {
         std::cout << "ParseRequestsStopsLenght FAIL" << std::endl;

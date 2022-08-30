@@ -6,6 +6,7 @@ CONFIG -= qt
 SOURCES += \
         domain.cpp \
         geo.cpp \
+        graph.pb.cc \
         json.cpp \
         json_builder.cpp \
         json_reader.cpp \
@@ -19,12 +20,14 @@ SOURCES += \
         tests.cpp \
         transport_catalogue.cpp \
         transport_catalogue.pb.cc \
-        transport_router.cpp
+        transport_router.cpp \
+        transport_router.pb.cc
 
 HEADERS += \
   domain.h \
   geo.h \
   graph.h \
+  graph.pb.h \
   json.h \
   json_builder.h \
   json_reader.h \
@@ -39,7 +42,8 @@ HEADERS += \
   tests.h \
   transport_catalogue.h \
   transport_catalogue.pb.h \
-  transport_router.h
+  transport_router.h \
+  transport_router.pb.h
 
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/package/lib/ -lprotobuf
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/package/lib/ -lprotobufd

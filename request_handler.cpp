@@ -2,12 +2,12 @@
 #include "serialization.h"
 
 //----------------------------------------------------------------------------
-RequestHandler::RequestHandler( TransportCatalogue::TransportCatalogue& db,
-                               TransportRouter::TransportRouter& tr,
-                               renderer::MapRenderer& renderer)
-    :t_c_(db)
-    ,tr_(tr)
-    ,m_r_(renderer)
+RequestHandler::RequestHandler( TransportCatalogue::TransportCatalogue& t_c,
+                               TransportRouter::TransportRouter& t_r,
+                               renderer::MapRenderer& m_r)
+    :t_c_(t_c)
+    ,t_r_(t_r)
+    ,m_r_(m_r)
 {
 
 }
@@ -23,10 +23,11 @@ std::optional<domain::BusStat> RequestHandler::GetBusStat(const std::string_view
 //----------------------------------------------------------------------------
 std::optional<domain::RoutStat> RequestHandler::GetRouteStat(std::string_view stop_from, std::string_view stop_to) const
 {
-    if(tr_.GetGraphIsNoInit()) {
-        tr_.CreateGraph(t_c_);
+    if(t_r_.GetGraphIsNoInit()) {
+        std::cerr << "CreateGraph" << std::endl;
+        t_r_.CreateGraph(t_c_);
     }
-    return tr_.GetRouteStat(t_c_.FindStop(stop_from).value()->id, t_c_.FindStop(stop_to).value()->id);
+    return t_r_.GetRouteStat(t_c_.FindStop(stop_from).value()->id, t_c_.FindStop(stop_to).value()->id);
 }
 //----------------------------------------------------------------------------
 std::optional< const std::unordered_set<const domain::Bus*>* > RequestHandler::GetBusesByStop(const std::string_view& stop_name) const
@@ -70,7 +71,7 @@ svg::Document RequestHandler::RenderMap() const
 void RequestHandler::CallDsrlz(const std::filesystem::path& path)
 {
     Serialization d_srlz;
-    d_srlz.Deserialize(path, t_c_, m_r_);
+    d_srlz.Deserialize(path, t_c_, m_r_, t_r_);
     m_r_.SetBuses(GetBusesLex());
     m_r_.SetUnicStops(GetUnicLexStopsIncludeBuses());
 }
@@ -78,7 +79,7 @@ void RequestHandler::CallDsrlz(const std::filesystem::path& path)
 void RequestHandler::CallSrlz(const std::filesystem::path& path) const
 {
     Serialization srlz;
-    srlz.Serialize(t_c_, m_r_, path);
+    srlz.Serialize(t_c_, m_r_, t_r_, path);
 }
 //----------------------------------------------------------------------------
 domain::BusStat RequestHandler::CreateBusStat(const domain::Bus* bus) const

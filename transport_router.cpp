@@ -16,9 +16,9 @@ void TransportRouter::CreateGraph(const TransportCatalogue::TransportCatalogue& 
                 const Stop* stop_to = *it_to;
                 lengh += db.GetRangeStops(prev_stop, stop_to);
                 prev_stop = stop_to;
-                double time_on_bus = lengh / GetMetrMinFromKmH( settings_.bus_velocity ); // minute
+                double time_on_bus = lengh / GetMetrMinFromKmH( routing_settings_.bus_velocity ); // minute
                 // вес ребра учитывает и ожидание и время в пути, чтобы учитывать затраты на пересадки
-                graph.AddEdge( {stop_from->id, stop_to->id, (time_on_bus + settings_.bus_wait_time_minut) } );
+                graph.AddEdge( {stop_from->id, stop_to->id, (time_on_bus + routing_settings_.bus_wait_time_minut) } );
                 // запоминает имя автобуса и количество прогонов между остановками
                 edges_buses_.push_back({bus.name, static_cast<size_t>(std::distance(it_from, it_to))});
             }
@@ -44,9 +44,9 @@ std::optional<RoutStat> TransportRouter::GetRouteStat(size_t id_stop_from, size_
         const auto& edge = opt_graph_.value().GetEdge(edge_id);
         // номер автобуса едущий по этому ребру и количество прогонов в ребре
         const auto [bus_num, span_count] = edges_buses_[edge_id];
-        items.push_back(RoutStat::ItemsWait{"Wait", static_cast<double>(settings_.bus_wait_time_minut), std::string(id_stopes_[edge.from])});
+        items.push_back(RoutStat::ItemsWait{"Wait", static_cast<double>(routing_settings_.bus_wait_time_minut), std::string(id_stopes_[edge.from])});
         // вычитаем из веса время ожидания
-        items.push_back(RoutStat::ItemsBus{"Bus", edge.weight - static_cast<double>(settings_.bus_wait_time_minut), span_count, std::string(bus_num)});
+        items.push_back(RoutStat::ItemsBus{"Bus", edge.weight - static_cast<double>(routing_settings_.bus_wait_time_minut), span_count, std::string(bus_num)});
     }
     return RoutStat{total_time, items};
 }
@@ -55,13 +55,54 @@ bool TransportRouter::GetGraphIsNoInit() const {
     return ! opt_graph_.has_value();
 }
 //----------------------------------------------------------------------------
+void TransportRouter::vInit(RoutingSettings routing_settings_, const TransportCatalogue::TransportCatalogue& t_c)
+{
+    SetRoutingSettings(std::move(routing_settings_));
+    // создаем граф и маршрутизатор
+    if(GetGraphIsNoInit()) {
+        CreateGraph(t_c);
+    }
+}
+//----------------------------------------------------------------------------
+const std::vector<TransportRouter::EdgeAditionInfo>& TransportRouter::GetEdgesBuses() const {
+    return edges_buses_;
+}
+//----------------------------------------------------------------------------
+const std::vector<std::string>& TransportRouter::GetIdStopes() const {
+    return id_stopes_;
+}
+//----------------------------------------------------------------------------
+const graph::DirectedWeightedGraph<double>& TransportRouter::GetGraph() const {
+    return opt_graph_.value();
+}
+//----------------------------------------------------------------------------
+void TransportRouter::SetEdgesBuses(std::vector<EdgeAditionInfo>&& edges_buses) {
+    edges_buses_ = std::move(edges_buses);
+}
+//----------------------------------------------------------------------------
+void TransportRouter::SetIdStopes(std::vector<std::string>&& id_stopes) {
+    id_stopes_ = id_stopes;
+}
+//----------------------------------------------------------------------------
+void TransportRouter::SetGraph(graph::DirectedWeightedGraph<double>&& graph) {
+    opt_graph_ = graph;
+}
+//----------------------------------------------------------------------------
+const RoutingSettings& TransportRouter::GetRoutingSettings() const {
+    return routing_settings_;
+}
+//----------------------------------------------------------------------------
+void TransportRouter::SetRoutingSettings(RoutingSettings&& routing_settings) {
+    routing_settings_ = std::move(routing_settings);
+}
+//----------------------------------------------------------------------------
 const std::unique_ptr<graph::Router<double>>& TransportRouter::GetRouter() const {
     // граф создан
     if(GetGraphIsNoInit()) {
         std::cerr << " ! opt_graph_.has_value()" << std::endl;
         throw("! opt_graph_.has_value()");
     }
-    // создает фаршрутизатор если его еще нет
+    // создает маршрутизатор если его еще нет
     if(! up_router_ ) {
         up_router_ = std::make_unique<graph::Router<double>>(opt_graph_.value());
     }

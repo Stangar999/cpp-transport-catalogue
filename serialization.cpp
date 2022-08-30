@@ -8,24 +8,28 @@ Serialization::Serialization()
 //----------------------------------------------------------------------------
 void Serialization::Serialize(const TransportCatalogue::TransportCatalogue& t_c
                               , const renderer::MapRenderer& m_r
+                              , const TransportRouter::TransportRouter& t_r
                               , const std::filesystem::path& path) const
 {
     t_c_srlz::TransportCatalogue s_t_c;
     SerializeTC(s_t_c, t_c);
     SerializeRS(s_t_c, m_r);
+    SerializeTR(s_t_c, t_r);
     std::ofstream out(path, std::ios::binary);
     s_t_c.SerializeToOstream(&out);
 }
 //----------------------------------------------------------------------------
 void Serialization::Deserialize(const std::filesystem::path& path
                               , TransportCatalogue::TransportCatalogue& t_c
-                              , renderer::MapRenderer& m_r) const
+                              , renderer::MapRenderer& m_r
+                              , TransportRouter::TransportRouter& t_r) const
 {
     std::ifstream in(path, std::ios::binary);
     t_c_srlz::TransportCatalogue s_t_c;
     s_t_c.ParseFromIstream(&in);
     DeserializeTC(s_t_c, t_c);
     DeserializeRS(s_t_c, m_r);
+    DeserializeTR(s_t_c, t_r);
 }
 //----------------------------------------------------------------------------
 void Serialization::SerializeTC(t_c_srlz::TransportCatalogue& s_t_c, const TransportCatalogue::TransportCatalogue& t_c) const
@@ -93,6 +97,37 @@ void Serialization::SerializeRS(t_c_srlz::TransportCatalogue& s_t_c, const rende
     }
 }
 //----------------------------------------------------------------------------
+void Serialization::SerializeTR(t_c_srlz::TransportCatalogue& s_t_c, const TransportRouter::TransportRouter& t_r) const
+{
+    s_t_c.mutable_t_r_()->mutable_routing_settings()->set_bus_velocity(t_r.GetRoutingSettings().bus_velocity);
+    s_t_c.mutable_t_r_()->mutable_routing_settings()->set_bus_wait_time_minut(t_r.GetRoutingSettings().bus_wait_time_minut);
+    for(const auto& edge_bus : t_r.GetEdgesBuses() ) {
+        t_r_srlz::EdgeAditionInfo edge_adition_info;
+        edge_adition_info.set_bus_name(std::string(edge_bus.bus_name));
+        edge_adition_info.set_count_spans(edge_bus.count_spans);
+        *s_t_c.mutable_t_r_()->add_edges_buses() = std::move(edge_adition_info);
+    }
+    for(const auto& id_stop : t_r.GetIdStopes() ) {
+        *s_t_c.mutable_t_r_()->add_id_stopes() = id_stop;
+    }
+    // граф
+    s_t_c.mutable_t_r_()->mutable_graph()->set_vertex_count(t_r.GetGraph().GetVertexCount());
+    for(const auto& edge : t_r.GetGraph().GetEdges() ) {
+        t_r_srlz::Edge s_edge;
+        s_edge.set_from(edge.from);
+        s_edge.set_to(edge.to);
+        s_edge.set_weight(edge.weight);
+        *s_t_c.mutable_t_r_()->mutable_graph()->add_edges() = std::move(s_edge);
+    }
+//    for(const auto& incidence_list : t_r.GetGraph().GetIncidenceLists() ) {
+//        t_r_srlz::IncidenceList s_incidence_list;
+//        for(const auto& edge_id : incidence_list ) {
+//            s_incidence_list.add_edge_id(edge_id);
+//        }
+//        *s_t_c.mutable_t_r_()->mutable_graph()->add_incidence_lists() = std::move(s_incidence_list);
+//    }
+}
+//----------------------------------------------------------------------------
 void Serialization::DeserializeTC(const t_c_srlz::TransportCatalogue& s_t_c, TransportCatalogue::TransportCatalogue& t_c) const
 {
     size_t count_stop =  s_t_c.list_stop_size();
@@ -153,6 +188,35 @@ void Serialization::DeserializeRS(const t_c_srlz::TransportCatalogue& s_t_c, ren
     }
     m_r.SetRenderSettings(std::move(render_settings));
 
+}
+//----------------------------------------------------------------------------
+void Serialization::DeserializeTR(const t_c_srlz::TransportCatalogue& s_t_c, TransportRouter::TransportRouter& t_r) const
+{
+    t_r.SetRoutingSettings( {.bus_wait_time_minut = s_t_c.t_r_().routing_settings().bus_wait_time_minut(),
+                             .bus_velocity = s_t_c.t_r_().routing_settings().bus_velocity()} );
+
+    std::vector<TransportRouter::TransportRouter::EdgeAditionInfo> edges_buses(s_t_c.t_r_().edges_buses_size());
+    for (int i = 0; i < s_t_c.t_r_().edges_buses_size(); ++i) {
+        edges_buses[i].bus_name = s_t_c.t_r_().edges_buses(i).bus_name();
+        edges_buses[i].count_spans = s_t_c.t_r_().edges_buses(i).count_spans();
+    }
+    t_r.SetEdgesBuses(std::move(edges_buses));
+
+    std::vector<std::string> id_stopes(s_t_c.t_r_().id_stopes_size());
+    for (int i = 0; i < s_t_c.t_r_().id_stopes_size(); ++i) {
+        id_stopes[i] = s_t_c.t_r_().id_stopes(i);
+    }
+    t_r.SetIdStopes(std::move(id_stopes));
+
+    graph::DirectedWeightedGraph<double> graph(s_t_c.t_r_().graph().vertex_count());
+    for (int i = 0; i < s_t_c.t_r_().graph().edges_size(); ++i) {
+        graph::Edge<double> edge;
+        edge.from = s_t_c.t_r_().graph().edges(i).from();
+        edge.to = s_t_c.t_r_().graph().edges(i).to();
+        edge.weight = s_t_c.t_r_().graph().edges(i).weight();
+        graph.AddEdge(std::move(edge));
+    }
+    t_r.SetGraph(std::move(graph));
 }
 //----------------------------------------------------------------------------
 r_s_srlz::Color Serialization::GetCurrentVariantSrlzColor(const svg::Color& color) const {

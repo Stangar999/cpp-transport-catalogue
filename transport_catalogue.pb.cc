@@ -86,6 +86,7 @@ PROTOBUF_CONSTEXPR TransportCatalogue::TransportCatalogue(
   , /*decltype(_impl_.list_bus_)*/{}
   , /*decltype(_impl_.list_stop_lenght_)*/{}
   , /*decltype(_impl_.render_settings_)*/nullptr
+  , /*decltype(_impl_.t_r__)*/nullptr
   , /*decltype(_impl_._cached_size_)*/{}} {}
 struct TransportCatalogueDefaultTypeInternal {
   PROTOBUF_CONSTEXPR TransportCatalogueDefaultTypeInternal()
@@ -147,6 +148,7 @@ const uint32_t TableStruct_transport_5fcatalogue_2eproto::offsets[] PROTOBUF_SEC
   PROTOBUF_FIELD_OFFSET(::t_c_srlz::TransportCatalogue, _impl_.list_bus_),
   PROTOBUF_FIELD_OFFSET(::t_c_srlz::TransportCatalogue, _impl_.list_stop_lenght_),
   PROTOBUF_FIELD_OFFSET(::t_c_srlz::TransportCatalogue, _impl_.render_settings_),
+  PROTOBUF_FIELD_OFFSET(::t_c_srlz::TransportCatalogue, _impl_.t_r__),
 };
 static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, -1, sizeof(::t_c_srlz::Coord)},
@@ -166,27 +168,30 @@ static const ::_pb::Message* const file_default_instances[] = {
 
 const char descriptor_table_protodef_transport_5fcatalogue_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
   "\n\031transport_catalogue.proto\022\010t_c_srlz\032\022m"
-  "ap_renderer.proto\",\n\005Coord\022\020\n\010latitude\030\001"
-  " \001(\001\022\021\n\tlongitude\030\002 \001(\001\"@\n\004Stop\022\014\n\004name\030"
-  "\001 \001(\t\022\036\n\005coord\030\002 \001(\0132\017.t_c_srlz.Coord\022\n\n"
-  "\002id\030\003 \001(\004\"A\n\003Bus\022\014\n\004name\030\001 \001(\t\022\026\n\016list_n"
-  "ame_stop\030\002 \003(\t\022\024\n\014is_roundtrip\030\003 \001(\010\"A\n\013"
-  "StopsLenght\022\021\n\tfrom_stop\030\001 \001(\t\022\017\n\007to_sto"
-  "p\030\002 \001(\t\022\016\n\006lenght\030\003 \001(\004\"\274\001\n\022TransportCat"
-  "alogue\022!\n\tlist_stop\030\001 \003(\0132\016.t_c_srlz.Sto"
-  "p\022\037\n\010list_bus\030\002 \003(\0132\r.t_c_srlz.Bus\022/\n\020li"
-  "st_stop_lenght\030\003 \003(\0132\025.t_c_srlz.StopsLen"
-  "ght\0221\n\017render_settings\030\004 \001(\0132\030.r_s_srlz."
-  "RenderSettingsb\006proto3"
+  "ap_renderer.proto\032\026transport_router.prot"
+  "o\",\n\005Coord\022\020\n\010latitude\030\001 \001(\001\022\021\n\tlongitud"
+  "e\030\002 \001(\001\"@\n\004Stop\022\014\n\004name\030\001 \001(\t\022\036\n\005coord\030\002"
+  " \001(\0132\017.t_c_srlz.Coord\022\n\n\002id\030\003 \001(\004\"A\n\003Bus"
+  "\022\014\n\004name\030\001 \001(\t\022\026\n\016list_name_stop\030\002 \003(\t\022\024"
+  "\n\014is_roundtrip\030\003 \001(\010\"A\n\013StopsLenght\022\021\n\tf"
+  "rom_stop\030\001 \001(\t\022\017\n\007to_stop\030\002 \001(\t\022\016\n\006lengh"
+  "t\030\003 \001(\004\"\345\001\n\022TransportCatalogue\022!\n\tlist_s"
+  "top\030\001 \003(\0132\016.t_c_srlz.Stop\022\037\n\010list_bus\030\002 "
+  "\003(\0132\r.t_c_srlz.Bus\022/\n\020list_stop_lenght\030\003"
+  " \003(\0132\025.t_c_srlz.StopsLenght\0221\n\017render_se"
+  "ttings\030\004 \001(\0132\030.r_s_srlz.RenderSettings\022\'"
+  "\n\004t_r_\030\005 \001(\0132\031.t_r_srlz.TransportRouterb"
+  "\006proto3"
   ;
-static const ::_pbi::DescriptorTable* const descriptor_table_transport_5fcatalogue_2eproto_deps[1] = {
+static const ::_pbi::DescriptorTable* const descriptor_table_transport_5fcatalogue_2eproto_deps[2] = {
   &::descriptor_table_map_5frenderer_2eproto,
+  &::descriptor_table_transport_5frouter_2eproto,
 };
 static ::_pbi::once_flag descriptor_table_transport_5fcatalogue_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_transport_5fcatalogue_2eproto = {
-    false, false, 502, descriptor_table_protodef_transport_5fcatalogue_2eproto,
+    false, false, 567, descriptor_table_protodef_transport_5fcatalogue_2eproto,
     "transport_catalogue.proto",
-    &descriptor_table_transport_5fcatalogue_2eproto_once, descriptor_table_transport_5fcatalogue_2eproto_deps, 1, 5,
+    &descriptor_table_transport_5fcatalogue_2eproto_once, descriptor_table_transport_5fcatalogue_2eproto_deps, 2, 5,
     schemas, file_default_instances, TableStruct_transport_5fcatalogue_2eproto::offsets,
     file_level_metadata_transport_5fcatalogue_2eproto, file_level_enum_descriptors_transport_5fcatalogue_2eproto,
     file_level_service_descriptors_transport_5fcatalogue_2eproto,
@@ -1264,17 +1269,28 @@ void StopsLenght::InternalSwap(StopsLenght* other) {
 class TransportCatalogue::_Internal {
  public:
   static const ::r_s_srlz::RenderSettings& render_settings(const TransportCatalogue* msg);
+  static const ::t_r_srlz::TransportRouter& t_r_(const TransportCatalogue* msg);
 };
 
 const ::r_s_srlz::RenderSettings&
 TransportCatalogue::_Internal::render_settings(const TransportCatalogue* msg) {
   return *msg->_impl_.render_settings_;
 }
+const ::t_r_srlz::TransportRouter&
+TransportCatalogue::_Internal::t_r_(const TransportCatalogue* msg) {
+  return *msg->_impl_.t_r__;
+}
 void TransportCatalogue::clear_render_settings() {
   if (GetArenaForAllocation() == nullptr && _impl_.render_settings_ != nullptr) {
     delete _impl_.render_settings_;
   }
   _impl_.render_settings_ = nullptr;
+}
+void TransportCatalogue::clear_t_r_() {
+  if (GetArenaForAllocation() == nullptr && _impl_.t_r__ != nullptr) {
+    delete _impl_.t_r__;
+  }
+  _impl_.t_r__ = nullptr;
 }
 TransportCatalogue::TransportCatalogue(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                          bool is_message_owned)
@@ -1290,11 +1306,15 @@ TransportCatalogue::TransportCatalogue(const TransportCatalogue& from)
     , decltype(_impl_.list_bus_){from._impl_.list_bus_}
     , decltype(_impl_.list_stop_lenght_){from._impl_.list_stop_lenght_}
     , decltype(_impl_.render_settings_){nullptr}
+    , decltype(_impl_.t_r__){nullptr}
     , /*decltype(_impl_._cached_size_)*/{}};
 
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   if (from._internal_has_render_settings()) {
     _this->_impl_.render_settings_ = new ::r_s_srlz::RenderSettings(*from._impl_.render_settings_);
+  }
+  if (from._internal_has_t_r_()) {
+    _this->_impl_.t_r__ = new ::t_r_srlz::TransportRouter(*from._impl_.t_r__);
   }
   // @@protoc_insertion_point(copy_constructor:t_c_srlz.TransportCatalogue)
 }
@@ -1308,6 +1328,7 @@ inline void TransportCatalogue::SharedCtor(
     , decltype(_impl_.list_bus_){arena}
     , decltype(_impl_.list_stop_lenght_){arena}
     , decltype(_impl_.render_settings_){nullptr}
+    , decltype(_impl_.t_r__){nullptr}
     , /*decltype(_impl_._cached_size_)*/{}
   };
 }
@@ -1327,6 +1348,7 @@ inline void TransportCatalogue::SharedDtor() {
   _impl_.list_bus_.~RepeatedPtrField();
   _impl_.list_stop_lenght_.~RepeatedPtrField();
   if (this != internal_default_instance()) delete _impl_.render_settings_;
+  if (this != internal_default_instance()) delete _impl_.t_r__;
 }
 
 void TransportCatalogue::SetCachedSize(int size) const {
@@ -1346,6 +1368,10 @@ void TransportCatalogue::Clear() {
     delete _impl_.render_settings_;
   }
   _impl_.render_settings_ = nullptr;
+  if (GetArenaForAllocation() == nullptr && _impl_.t_r__ != nullptr) {
+    delete _impl_.t_r__;
+  }
+  _impl_.t_r__ = nullptr;
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -1398,6 +1424,14 @@ const char* TransportCatalogue::_InternalParse(const char* ptr, ::_pbi::ParseCon
       case 4:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 34)) {
           ptr = ctx->ParseMessage(_internal_mutable_render_settings(), ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // .t_r_srlz.TransportRouter t_r_ = 5;
+      case 5:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 42)) {
+          ptr = ctx->ParseMessage(_internal_mutable_t_r_(), ptr);
           CHK_(ptr);
         } else
           goto handle_unusual;
@@ -1462,6 +1496,13 @@ uint8_t* TransportCatalogue::_InternalSerialize(
         _Internal::render_settings(this).GetCachedSize(), target, stream);
   }
 
+  // .t_r_srlz.TransportRouter t_r_ = 5;
+  if (this->_internal_has_t_r_()) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(5, _Internal::t_r_(this),
+        _Internal::t_r_(this).GetCachedSize(), target, stream);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -1506,6 +1547,13 @@ size_t TransportCatalogue::ByteSizeLong() const {
         *_impl_.render_settings_);
   }
 
+  // .t_r_srlz.TransportRouter t_r_ = 5;
+  if (this->_internal_has_t_r_()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+        *_impl_.t_r__);
+  }
+
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
@@ -1531,6 +1579,10 @@ void TransportCatalogue::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, con
     _this->_internal_mutable_render_settings()->::r_s_srlz::RenderSettings::MergeFrom(
         from._internal_render_settings());
   }
+  if (from._internal_has_t_r_()) {
+    _this->_internal_mutable_t_r_()->::t_r_srlz::TransportRouter::MergeFrom(
+        from._internal_t_r_());
+  }
   _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
 
@@ -1551,7 +1603,12 @@ void TransportCatalogue::InternalSwap(TransportCatalogue* other) {
   _impl_.list_stop_.InternalSwap(&other->_impl_.list_stop_);
   _impl_.list_bus_.InternalSwap(&other->_impl_.list_bus_);
   _impl_.list_stop_lenght_.InternalSwap(&other->_impl_.list_stop_lenght_);
-  swap(_impl_.render_settings_, other->_impl_.render_settings_);
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(TransportCatalogue, _impl_.t_r__)
+      + sizeof(TransportCatalogue::_impl_.t_r__)
+      - PROTOBUF_FIELD_OFFSET(TransportCatalogue, _impl_.render_settings_)>(
+          reinterpret_cast<char*>(&_impl_.render_settings_),
+          reinterpret_cast<char*>(&other->_impl_.render_settings_));
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata TransportCatalogue::GetMetadata() const {

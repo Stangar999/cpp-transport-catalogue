@@ -23,7 +23,7 @@ int main(int argc, char* argv[]) {
 
     const std::string_view mode(argv[1]);
 // make_base
-    if (mode == "make_base"sv) {
+    if (mode == "1"sv) {
         TransportCatalogue::TransportCatalogue db;
         TransportRouter::TransportRouter tr;
         renderer::MapRenderer rend;
@@ -31,7 +31,7 @@ int main(int argc, char* argv[]) {
         JsonReader::JsonReader j_r(db, tr, req_hand, rend);
         j_r.ParseJsonMakeBase(cin);
 // process_requests
-    } else if (mode == "process_requests"sv) {
+    } else if (mode == "2"sv) {
         TransportCatalogue::TransportCatalogue db;
         TransportRouter::TransportRouter tr;
         renderer::MapRenderer rend;

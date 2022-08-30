@@ -31,6 +31,7 @@
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
 #include <google/protobuf/unknown_field_set.h>
 #include "map_renderer.pb.h"
+#include "transport_router.pb.h"
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 #define PROTOBUF_INTERNAL_EXPORT_transport_5fcatalogue_2eproto
@@ -911,6 +912,7 @@ class TransportCatalogue final :
     kListBusFieldNumber = 2,
     kListStopLenghtFieldNumber = 3,
     kRenderSettingsFieldNumber = 4,
+    kTRFieldNumber = 5,
   };
   // repeated .t_c_srlz.Stop list_stop = 1;
   int list_stop_size() const;
@@ -984,6 +986,24 @@ class TransportCatalogue final :
       ::r_s_srlz::RenderSettings* render_settings);
   ::r_s_srlz::RenderSettings* unsafe_arena_release_render_settings();
 
+  // .t_r_srlz.TransportRouter t_r_ = 5;
+  bool has_t_r_() const;
+  private:
+  bool _internal_has_t_r_() const;
+  public:
+  void clear_t_r_();
+  const ::t_r_srlz::TransportRouter& t_r_() const;
+  PROTOBUF_NODISCARD ::t_r_srlz::TransportRouter* release_t_r_();
+  ::t_r_srlz::TransportRouter* mutable_t_r_();
+  void set_allocated_t_r_(::t_r_srlz::TransportRouter* t_r_);
+  private:
+  const ::t_r_srlz::TransportRouter& _internal_t_r_() const;
+  ::t_r_srlz::TransportRouter* _internal_mutable_t_r_();
+  public:
+  void unsafe_arena_set_allocated_t_r_(
+      ::t_r_srlz::TransportRouter* t_r_);
+  ::t_r_srlz::TransportRouter* unsafe_arena_release_t_r_();
+
   // @@protoc_insertion_point(class_scope:t_c_srlz.TransportCatalogue)
  private:
   class _Internal;
@@ -996,6 +1016,7 @@ class TransportCatalogue final :
     ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::t_c_srlz::Bus > list_bus_;
     ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::t_c_srlz::StopsLenght > list_stop_lenght_;
     ::r_s_srlz::RenderSettings* render_settings_;
+    ::t_r_srlz::TransportRouter* t_r__;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
   union { Impl_ _impl_; };
@@ -1696,6 +1717,91 @@ inline void TransportCatalogue::set_allocated_render_settings(::r_s_srlz::Render
   }
   _impl_.render_settings_ = render_settings;
   // @@protoc_insertion_point(field_set_allocated:t_c_srlz.TransportCatalogue.render_settings)
+}
+
+// .t_r_srlz.TransportRouter t_r_ = 5;
+inline bool TransportCatalogue::_internal_has_t_r_() const {
+  return this != internal_default_instance() && _impl_.t_r__ != nullptr;
+}
+inline bool TransportCatalogue::has_t_r_() const {
+  return _internal_has_t_r_();
+}
+inline const ::t_r_srlz::TransportRouter& TransportCatalogue::_internal_t_r_() const {
+  const ::t_r_srlz::TransportRouter* p = _impl_.t_r__;
+  return p != nullptr ? *p : reinterpret_cast<const ::t_r_srlz::TransportRouter&>(
+      ::t_r_srlz::_TransportRouter_default_instance_);
+}
+inline const ::t_r_srlz::TransportRouter& TransportCatalogue::t_r_() const {
+  // @@protoc_insertion_point(field_get:t_c_srlz.TransportCatalogue.t_r_)
+  return _internal_t_r_();
+}
+inline void TransportCatalogue::unsafe_arena_set_allocated_t_r_(
+    ::t_r_srlz::TransportRouter* t_r_) {
+  if (GetArenaForAllocation() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.t_r__);
+  }
+  _impl_.t_r__ = t_r_;
+  if (t_r_) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:t_c_srlz.TransportCatalogue.t_r_)
+}
+inline ::t_r_srlz::TransportRouter* TransportCatalogue::release_t_r_() {
+  
+  ::t_r_srlz::TransportRouter* temp = _impl_.t_r__;
+  _impl_.t_r__ = nullptr;
+#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+  auto* old =  reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
+  temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  if (GetArenaForAllocation() == nullptr) { delete old; }
+#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
+  if (GetArenaForAllocation() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+  return temp;
+}
+inline ::t_r_srlz::TransportRouter* TransportCatalogue::unsafe_arena_release_t_r_() {
+  // @@protoc_insertion_point(field_release:t_c_srlz.TransportCatalogue.t_r_)
+  
+  ::t_r_srlz::TransportRouter* temp = _impl_.t_r__;
+  _impl_.t_r__ = nullptr;
+  return temp;
+}
+inline ::t_r_srlz::TransportRouter* TransportCatalogue::_internal_mutable_t_r_() {
+  
+  if (_impl_.t_r__ == nullptr) {
+    auto* p = CreateMaybeMessage<::t_r_srlz::TransportRouter>(GetArenaForAllocation());
+    _impl_.t_r__ = p;
+  }
+  return _impl_.t_r__;
+}
+inline ::t_r_srlz::TransportRouter* TransportCatalogue::mutable_t_r_() {
+  ::t_r_srlz::TransportRouter* _msg = _internal_mutable_t_r_();
+  // @@protoc_insertion_point(field_mutable:t_c_srlz.TransportCatalogue.t_r_)
+  return _msg;
+}
+inline void TransportCatalogue::set_allocated_t_r_(::t_r_srlz::TransportRouter* t_r_) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.t_r__);
+  }
+  if (t_r_) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+        ::PROTOBUF_NAMESPACE_ID::Arena::InternalGetOwningArena(
+                reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(t_r_));
+    if (message_arena != submessage_arena) {
+      t_r_ = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, t_r_, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  _impl_.t_r__ = t_r_;
+  // @@protoc_insertion_point(field_set_allocated:t_c_srlz.TransportCatalogue.t_r_)
 }
 
 #ifdef __GNUC__
