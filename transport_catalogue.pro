@@ -4,6 +4,7 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
+        data_transport_catalogue.pb.cc \
         domain.cpp \
         geo.cpp \
         graph.pb.cc \
@@ -24,6 +25,7 @@ SOURCES += \
         transport_router.pb.cc
 
 HEADERS += \
+  data_transport_catalogue.pb.h \
   domain.h \
   geo.h \
   graph.h \

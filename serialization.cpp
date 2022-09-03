@@ -35,10 +35,10 @@ void Serialization::Deserialize(const std::filesystem::path& path
 void Serialization::SerializeTrnsprtCtlg(t_c_srlz::TransportCatalogue& srlz_trnsprt_ctlg, const TransportCatalogue::TransportCatalogue& trnsprt_ctlg) const
 {
     for(const auto& stop : trnsprt_ctlg.GetStops()) {
-        t_c_srlz::Stop s_stop;
+        d_t_c_srlz::Stop s_stop;
         s_stop.set_name(stop.name);
 
-        t_c_srlz::Coord s_coord;
+        d_t_c_srlz::Coord s_coord;
         s_coord.set_latitude(stop.coord.lat);
         s_coord.set_longitude(stop.coord.lng);
         *s_stop.mutable_coord() = std::move(s_coord);
@@ -47,7 +47,7 @@ void Serialization::SerializeTrnsprtCtlg(t_c_srlz::TransportCatalogue& srlz_trns
         *srlz_trnsprt_ctlg.add_list_stop() = std::move(s_stop);
     }
     for(const auto& bus : trnsprt_ctlg.GetBuses()) {
-        t_c_srlz::Bus s_bus;
+        d_t_c_srlz::Bus s_bus;
         s_bus.set_name(bus.name);
 
         for(const auto& stop : bus.stops) {
@@ -58,7 +58,7 @@ void Serialization::SerializeTrnsprtCtlg(t_c_srlz::TransportCatalogue& srlz_trns
         *srlz_trnsprt_ctlg.add_list_bus() = std::move(s_bus);
     }
     for(const auto& struc : trnsprt_ctlg.GetIndexRageStop()) {
-        t_c_srlz::StopsLenght s_stop_lenght;
+        d_t_c_srlz::StopsLenght s_stop_lenght;
         s_stop_lenght.set_from_stop(struc.first.first->name);
         s_stop_lenght.set_to_stop(struc.first.second->name);
         s_stop_lenght.set_lenght(struc.second);
@@ -185,28 +185,28 @@ void Serialization::DeserializeRendrSettng(const t_c_srlz::TransportCatalogue& s
 //----------------------------------------------------------------------------
 void Serialization::DeserializeTrnsprtRoutr(const t_c_srlz::TransportCatalogue& srlz_trnsprt_ctlg, TransportRouter::TransportRouter& trnsprt_routr_) const
 {
-    trnsprt_routr_.SetRoutingSettings( {.bus_wait_time_minut = srlz_trnsprt_ctlg.trnsprt_routr_().routing_settings().bus_wait_time_minut(),
-                             .bus_velocity = srlz_trnsprt_ctlg.trnsprt_routr_().routing_settings().bus_velocity()} );
+    trnsprt_routr_.SetRoutingSettings( {.bus_wait_time_minut = srlz_trnsprt_ctlg.t_r_().routing_settings().bus_wait_time_minut(),
+                             .bus_velocity = srlz_trnsprt_ctlg.t_r_().routing_settings().bus_velocity()} );
 
-    std::vector<TransportRouter::TransportRouter::EdgeAditionInfo> edges_buses(srlz_trnsprt_ctlg.trnsprt_routr_().edges_buses_size());
-    for (int i = 0; i < srlz_trnsprt_ctlg.trnsprt_routr_().edges_buses_size(); ++i) {
-        edges_buses[i].bus_name = srlz_trnsprt_ctlg.trnsprt_routr_().edges_buses(i).bus_name();
-        edges_buses[i].count_spans = srlz_trnsprt_ctlg.trnsprt_routr_().edges_buses(i).count_spans();
+    std::vector<TransportRouter::TransportRouter::EdgeAditionInfo> edges_buses(srlz_trnsprt_ctlg.t_r_().edges_buses_size());
+    for (int i = 0; i < srlz_trnsprt_ctlg.t_r_().edges_buses_size(); ++i) {
+        edges_buses[i].bus_name = srlz_trnsprt_ctlg.t_r_().edges_buses(i).bus_name();
+        edges_buses[i].count_spans = srlz_trnsprt_ctlg.t_r_().edges_buses(i).count_spans();
     }
     trnsprt_routr_.SetEdgesBuses(std::move(edges_buses));
 
-    std::vector<std::string> id_stopes(srlz_trnsprt_ctlg.trnsprt_routr_().id_stopes_size());
-    for (int i = 0; i < srlz_trnsprt_ctlg.trnsprt_routr_().id_stopes_size(); ++i) {
-        id_stopes[i] = srlz_trnsprt_ctlg.trnsprt_routr_().id_stopes(i);
+    std::vector<std::string> id_stopes(srlz_trnsprt_ctlg.t_r_().id_stopes_size());
+    for (int i = 0; i < srlz_trnsprt_ctlg.t_r_().id_stopes_size(); ++i) {
+        id_stopes[i] = srlz_trnsprt_ctlg.t_r_().id_stopes(i);
     }
     trnsprt_routr_.SetIdStopes(std::move(id_stopes));
 
-    graph::DirectedWeightedGraph<double> graph(srlz_trnsprt_ctlg.trnsprt_routr_().graph().vertex_count());
-    for (int i = 0; i < srlz_trnsprt_ctlg.trnsprt_routr_().graph().edges_size(); ++i) {
+    graph::DirectedWeightedGraph<double> graph(srlz_trnsprt_ctlg.t_r_().graph().vertex_count());
+    for (int i = 0; i < srlz_trnsprt_ctlg.t_r_().graph().edges_size(); ++i) {
         graph::Edge<double> edge;
-        edge.from = srlz_trnsprt_ctlg.trnsprt_routr_().graph().edges(i).from();
-        edge.to = srlz_trnsprt_ctlg.trnsprt_routr_().graph().edges(i).to();
-        edge.weight = srlz_trnsprt_ctlg.trnsprt_routr_().graph().edges(i).weight();
+        edge.from = srlz_trnsprt_ctlg.t_r_().graph().edges(i).from();
+        edge.to = srlz_trnsprt_ctlg.t_r_().graph().edges(i).to();
+        edge.weight = srlz_trnsprt_ctlg.t_r_().graph().edges(i).weight();
         graph.AddEdge(std::move(edge));
     }
     trnsprt_routr_.SetGraph(std::move(graph));
