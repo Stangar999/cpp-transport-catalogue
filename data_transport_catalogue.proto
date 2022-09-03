@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package d_t_c_srlz;
+
+message Coord {
+	double latitude = 1;
+	double longitude = 2;
+}
+
+message Stop {
+    string name = 1;
+	Coord coord = 2;
+	uint64 id = 3;
+} 
+
+message Bus {
+    string name = 1;
+    repeated string list_name_stop = 2;
+	bool is_roundtrip = 3;
+} 
+
+message StopsLenght {
+    string from_stop = 1;
+	string to_stop = 2;
+    uint64 lenght = 3;
+} 
