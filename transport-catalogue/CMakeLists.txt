@@ -3,8 +3,7 @@
 project(TransportCatalogue CXX)
 set(CMAKE_CXX_STANDARD 17)
 
-#set(CMAKE_PREFIX_PATH "./package" CACHE STRING "Proto static library directory")
-
+set(CMAKE_PREFIX_PATH "./package")
 # Эта команда найдёт собранный нами пакет Protobuf.
 # REQUIRED означает, что библиотека обязательна.
 # Путь для поиска укажем в параметрах команды cmake.
@@ -55,5 +54,5 @@ string(REPLACE "protobuf.a" "protobufd.a" "Protobuf_LIBRARY_DEBUG" "${Protobuf_L
 
 # Также find_package определила Protobuf_LIBRARY.
 # Protobuf зависит от библиотеки Threads. Добавим и её при компоновке.
-#target_link_libraries(transport_catalogue ${Protobuf_LIBRARY_DEBUG} Threads::Threads)
-target_link_libraries(transport_catalogue "$<IF:$<CONFIG:Debug>,${Protobuf_LIBRARY_DEBUG},${Protobuf_LIBRARY}>" Threads::Threads)
+target_link_libraries(transport_catalogue ${Protobuf_LIBRARY_DEBUG} Threads::Threads)
+#target_link_libraries(transport_catalogue "$<IF:$<CONFIG:Debug>,${Protobuf_LIBRARY_DEBUG},${Protobuf_LIBRARY}>" Threads::Threads)
