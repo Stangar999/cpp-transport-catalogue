@@ -1,4 +1,4 @@
-# cpp-transport-catalogue
+# transport-catalogue
 ## Транспортный справочник
 
 ## Цель проекта
